@@ -1,0 +1,32 @@
+
+{{ config(alias='{@stage_table_name}') }}
+{% set model_name = '{@stage_table_name}' %}
+{% set ref_model_name = 'input__{@source_table_name}' %}
+
+WITH rename as ( 
+	select  
+		delta_hash
+		, row_hash
+		, cycle_date
+        {%- set query -%}
+			select  
+				stage_column_name, source_column_name  
+			from internal.dictionary 
+			where 
+				database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+				and stage_table_name='{{model_name}}' 
+				and stage_column_name is not null
+			order by column_order
+        {%- endset -%}
+
+        {%- set columns = run_query(query) -%}    
+        {%- for column in columns %}
+		, {{column.SOURCE_COLUMN_NAME}} AS {{column.STAGE_COLUMN_NAME}}
+        {%- endfor %}
+	from {{ ref(ref_model_name) }} 
+)  
+
+select  
+	* 
+from rename 
+  

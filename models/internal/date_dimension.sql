@@ -1,3 +1,5 @@
+  {{ config(schema='internal') }}
+  
   WITH generate_dates AS (
     SELECT DATEADD(DAY, SEQ4(), '2000-01-01') AS the_date
       FROM TABLE(GENERATOR(ROWCOUNT=>10000))  -- Number of days after reference date in previous line

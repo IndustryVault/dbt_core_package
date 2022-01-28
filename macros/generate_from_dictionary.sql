@@ -286,7 +286,7 @@
 
 {% endmacro %}
 --
-{% macro generate_portfolio_from_dictionary(generate_columns=True, include_descriptions=True) %}
+{% macro generate_model_from_dictionary(schema_name, generate_columns=True, include_descriptions=True) %}
 
     {% set sources_yaml=[] %}
 
@@ -298,7 +298,7 @@
     {% set tables=get_tables_from_dictionary() %}
 
     {% for tbl in tables %}
-        {% do sources_yaml.append('      - name: ' ~ 'portfolio__' ~ tbl.STAGE_TABLE_NAME ) %}
+        {% do sources_yaml.append('      - name: ' ~ schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME ) %}
         {% do sources_yaml.append('        description: Model description' ) %}
         {% if generate_columns %}
             {% do sources_yaml.append('        columns:') %}
@@ -319,6 +319,20 @@
                         AND stage_column_name is not null 
                     order by column_order
                 {% endset %}
+		{% if schema_name=='public' %}
+			{% set query %}
+			    select  
+				source_column_name, source_column_type, stage_column_description, stage_column_name  
+			    from internal.dictionary 
+			    where 
+				database_name='{{ var('dictionary_database') }}' 
+				and version_name='{{ var('dictionary_database_version') }}' 
+				and stage_table_name='{{tbl.STAGE_TABLE_NAME}}' 
+				AND stage_column_name is not null and is_public=1
+			    order by column_order
+			{% endset %}
+        	{% endif %}
+			
             {% set columns=run_query(query) %}
             {% for column in columns %}
                 {% do sources_yaml.append('          - name: ' ~ column.STAGE_COLUMN_NAME ) %}

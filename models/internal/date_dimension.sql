@@ -1,4 +1,4 @@
-  {{ config(materialized='table', sort='the_date', schema='internal') }}
+  {{ config(materialized='view', sort='the_date', schema='internal') }}
   
   WITH generate_dates AS (
     SELECT DATEADD(DAY, SEQ4(), '2000-01-01') AS the_date

@@ -1,1 +1,1 @@
-Select * From {{ ref('vw_date_dimension' }}
+Select * From {{ ref('vw_date_dimension') }}

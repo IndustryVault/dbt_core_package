@@ -62,6 +62,7 @@
     {% set sources_yaml=[] %}
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('use database ' ~ var('dictionary_database') ~';') %}
+    {% do sources_yaml.append('create or replace schema external;') %}
 
     {% if table_only=='false' %}
         {% if external_file_format == 'csv' %}

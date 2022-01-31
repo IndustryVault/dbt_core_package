@@ -1,7 +1,7 @@
   {{ config(materialized='view', sort='the_date', schema='internal') }}
   
   WITH generate_dates AS (
-    SELECT DATEADD(DAY, SEQ4(), {{ var('date_dimension_start_date')}}) AS the_date
+    SELECT DATEADD(DAY, SEQ4(), '{{ var('date_dimension_start_date') }}' ) AS the_date
       FROM TABLE(GENERATOR(ROWCOUNT=>{{ var('date_dimension_day_count') }} ))  -- Number of days after reference date in previous line
   )
   SELECT the_date

@@ -17,5 +17,9 @@ a set of macros that will generate scaffording for a DBT based a comma separate 
 * stage_column_type - the type information for a column
 
 To use this set of macros you first must create a dictionary that meets the above requirements. You may, of course, have additional information in your dictionary but the above fields are directly referenced by the macros so they must be present. At that point you can run the following commands:
-* generate_external_from_dictionary - this generates in the log output the script needed to create the external tables defined in the dictionary
-* 
+
+* `dbt run-operation generate_external_from_dictionary` - build the script in the log output (no ability to write to a file in this macro language) that when executed will create the external tables that are the underpinning of this project. This has an optional argument that will instead generate normal tables. This was needed in working in an environment that did not have access to the raw JSON files
+* `dbt run-operation generate_external_from_dictionary --args '{table_only: true}'` - build the script in the log output (no ability to write to a file in this macro language) that when executed will create the external tables that are the underpinning of this project. This has an optional argument that will instead generate normal tables. This was needed in working in an environment that did not have access to the raw JSON files
+* `dbt run-operation generate_external_refresh_from_dictionary` - builds the refresh script to update the data in the external tables
+* `dbt run-operation generate_source_from_dictionary` - builds the sources yml file (again, in the log output) that is copied and pasted into bde_src.yml
+* `dbt run-operation generate_model_from_dictionary` - builds the model yml file in the log output that is copied and paster into bde_portfolio.yml

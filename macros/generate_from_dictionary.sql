@@ -88,7 +88,7 @@
         {% endif %}
 
         {% set query %}
-            select  source_column_name, source_column_type, lower(stage_column_type) stage_column_type, column_order, external_column_name 
+            select  source_column_name, source_column_type, lower(stage_column_type) stage_column_type, column_order, ISNULL(external_column_name, source_column_name) external_column_name 
             from internal.dictionary 
             where 
                 database_name='{{ var('dictionary_database') }}' 

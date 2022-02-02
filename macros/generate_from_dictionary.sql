@@ -76,7 +76,7 @@
     {% set tables=get_tables_from_dictionary() %}
     {% for tbl in tables %}
         {% if table_only == 'false' %}
-            {% do sources_yaml.append('CREATE OR REPLACE EXTERNAL TABLE ' ~ tbl.SOURCE_TABLE_NAME) %}
+            {% do sources_yaml.append('CREATE OR REPLACE EXTERNAL TABLE external.' ~ tbl.SOURCE_TABLE_NAME) %}
         {% else %}
             {% do sources_yaml.append('CREATE OR REPLACE TABLE external.' ~ tbl.SOURCE_TABLE_NAME) %}
         {% endif %}

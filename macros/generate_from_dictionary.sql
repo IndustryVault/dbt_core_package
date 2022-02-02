@@ -93,7 +93,7 @@
             where 
                 database_name='{{ var('dictionary_database') }}' 
                 and version_name='{{ var('dictionary_database_version') }}' 
-                and source_table_name='{{tbl.SOURCE_TABLE_NAME}}'  
+                and lower(source_table_name)=lower('{{tbl.SOURCE_TABLE_NAME}}' )
             order by column_order
         {% endset %}
         {% set columns=run_query(query) %}

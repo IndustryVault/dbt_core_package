@@ -12,6 +12,7 @@
     {% do temp.append('  field_delimiter = \'{@field}\'' | replace('{@field}', var('dictionary_field_delimiter') )) %}
     {% do temp.append('  skip_header = ' ~ var('dictionary_skip_header')) %}
     {% do temp.append('  TRIM_SPACE = ' ~ var('dictionary_trim_spaces'))  %}
+    {% do temp.append('  ESCAPE_UNENCLOSED_FIELD = NONE ')  %}
     {% do temp.append('  NULL_IF=\'NA\'') %}
     {% do temp.append(';') %}
 

@@ -7,7 +7,7 @@
     {% set file_format_name = var('dictionary_file_format_name') %}
     {% set temp=[] %}
     {% do temp.append('') %}
-    {% do temp.append('CREATE OR REPLACE FILE FORMAT ' ~ file_format_name) %}
+    {% do temp.append('CREATE FILE FORMAT IF NOT EXISTS ' ~ file_format_name) %}
     {% do temp.append('  TYPE = \'CSV\'') %}
     {% do temp.append('  field_delimiter = \'{@field}\'' | replace('{@field}', var('dictionary_field_delimiter') )) %}
     {% do temp.append('  skip_header = ' ~ var('dictionary_skip_header')) %}
@@ -24,7 +24,7 @@
     {% set file_format_name = var('dictionary_file_format_name') %}
     {% set temp=[] %}
     {% do temp.append('') %}
-    {% do temp.append('CREATE OR REPLACE FILE FORMAT ' ~ file_format_name) %}
+    {% do temp.append('CREATE FILE FORMAT IF NOT EXISTS ' ~ file_format_name) %}
     {% do temp.append('  TYPE = \'JSON\'') %}
     {% do temp.append('  STRIP_OUTER_ARRAY = true') %}
     {% do temp.append(';') %}

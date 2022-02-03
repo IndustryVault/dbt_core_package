@@ -109,9 +109,9 @@
                     {% set column_label = column.EXTERNAL_COLUMN_NAME %}
                 {% endif %}
                 {% if column.STAGE_COLUMN_TYPE == 'date' %}
-                    {% do sources_yaml.append('	, {@source_column_name} {@data_type} as to_date(value:"{@column_label}"::varchar(100), \'{@date_format}\')' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.dateformat ) )%}
+                    {% do sources_yaml.append('	, {@source_column_name} {@data_type} as to_date(value:"{@column_label}"::varchar(100), \'{@date_format}\')' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.DATEFORMAT ) )%}
                 {% elif column.STAGE_COLUMN_TYPE == 'datetime' %}
-                    {% do sources_yaml.append('	, {@source_column_name} {@data_type} as to_timestamp(value:"{@column_label}"::varchar(100), \'{@date_format}\')' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.dateformat ) )%}
+                    {% do sources_yaml.append('	, {@source_column_name} {@data_type} as to_timestamp(value:"{@column_label}"::varchar(100), \'{@date_format}\')' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.DATEFORMAT ) )%}
                 {% else %}
                     {% do sources_yaml.append('	, {@source_column_name} {@data_type} as (value:"{@column_label}"::{@data_type})' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}',  column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE) ) %}
                 {% endif %}

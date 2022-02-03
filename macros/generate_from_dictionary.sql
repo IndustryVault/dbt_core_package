@@ -92,7 +92,7 @@
             select  
 	    	source_column_name, source_column_type, lower(stage_column_type) stage_column_type, column_order
 		, IFNULL(external_column_name, source_column_name) external_column_name 
-		, IFNULL(date_format,'{{ var('dictionary_date_format') }}') date_format
+		, '{{ var('dictionary_date_format') }}' date_format
             from internal.dictionary 
             where 
                 database_name='{{ var('dictionary_database') }}' 

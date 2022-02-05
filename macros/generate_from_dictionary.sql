@@ -7,7 +7,7 @@
 # Uses an insert into to pull data through all layers in the stack and populate tables in
 # the public schema. Should generate the best performance for public usage.
 
-{% macro generate_insert_into_from_dictionaty(change_only='false') %}
+{% macro generate_insert_into_from_dictionary(change_only='false') %}
 
     {% set temp=[] %}
     {% do temp.append('') %}
@@ -18,7 +18,7 @@
 	    from internal.dictionary 
 	    where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-		and is_public=1 and comments is null
+		and is_public=1 and has_column_issue=0 and has_table_issue=0
 	    order by stage_table_name
 	{%- endset -%}
 	{%- set tables = run_query(query) -%}    
@@ -36,7 +36,7 @@
 		    where 
 			database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 			and stage_table_name='{{model_name}}' 
-			and is_public=1 and comments is null
+			and is_public=1 and has_column_issue=0 and has_table_issue=0
 		    order by column_order
 		{%- endset -%}
 

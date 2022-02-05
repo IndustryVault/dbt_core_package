@@ -42,6 +42,7 @@
 	{% endfor %}
 
     {% set results = temp | join ('\n') %}
+    {{ log(results, info=True) }}
     {% do return(results) %}
 {% endmacro %}
 --

@@ -67,6 +67,9 @@
 	    {% do temp.append(';') %}
 
 	{% endfor %}
+
+    {% set results = temp | join ('\n') %}
+    {% do return(results) %}
 {% endmacro %}
 --
 

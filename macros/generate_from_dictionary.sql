@@ -13,13 +13,14 @@
     {% do temp.append('') %}
 
 	{%- set query -%}
-	    select  
-		DISTINCT stage_table_name 
-	    from internal.dictionary 
-	    where 
+	select  
+		DISTINCT stage_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
+	from bde.internal.dictionary 
+	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 		and is_public=1 and has_column_issue=0 and has_table_issue=0
-	    order by stage_table_name
+	group by stage_table_name
+	order by stage_table_name
 	{%- endset -%}
 	{%- set tables = run_query(query) -%}    
 
@@ -29,40 +30,12 @@
 	    {% do temp.append('INSERT INTO  public__' ~ model_name  ~ ' ( ' ) %}
 	    {% do temp.append('   cycle_date ' ) %}
 	    {% do temp.append('   , as_of_date ' ) %}
-		{%- set query -%}
-		    select  
-			stage_column_name, source_column_name  
-		    from internal.dictionary 
-		    where 
-			database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-			and stage_table_name='{{model_name}}' 
-			and is_public=1 and has_column_issue=0 and has_table_issue=0
-		    order by column_order
-		{%- endset -%}
-
-		{%- set columns = run_query(query) -%}    
-		{%- for column in columns %}
-	    {% do temp.append('   , ' ~ column.STAGE_COLUMN_NAME ) %}
-		{%- endfor %}
+	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
 	    {% do temp.append(')') %}
 	    {% do temp.append('Select ') %}
 	    {% do temp.append('   cycle_date ') %}
 	    {% do temp.append('   , as_of_date ') %}
-		{%- set query -%}
-		    select  
-			stage_column_name, source_column_name  
-		    from internal.dictionary 
-		    where 
-			database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-			and stage_table_name='{{model_name}}' 
-			and is_public=1 and has_column_issue=0 and has_table_issue=0
-		    order by column_order
-		{%- endset -%}
-
-		{%- set columns = run_query(query) -%}    
-		{%- for column in columns %}
-		{% do temp.append('   , ' ~ column.STAGE_COLUMN_NAME ) %}
-		{%- endfor %}
+	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
 	    {% do temp.append('   from portfolio__' ~ model_name ) %}
 	    {% do temp.append(';') %}
 

@@ -11,6 +11,8 @@
 
     {% set temp=[] %}
     {% do temp.append('') %}
+    {% do temp.append('use database ' ~ var('dictionary_database') ~';') %}
+    {% do temp.append('use schema public;') %}
 
 	{%- set query -%}
 	select  
@@ -26,8 +28,8 @@
 
 	{% for tbl in tables %}
 	    {% set model_name = tbl.STAGE_TABLE_NAME %}
-	    {% do temp.append('truncate table public__' ~ model_name ~ ';' ) %}
-	    {% do temp.append('INSERT INTO  public__' ~ model_name  ~ ' ( ' ) %}
+	    {% do temp.append('truncate table public.' ~ model_name ~ ';' ) %}
+	    {% do temp.append('INSERT INTO  public.' ~ model_name  ~ ' ( ' ) %}
 	    {% do temp.append('   cycle_date ' ) %}
 	    {% do temp.append('   , as_of_date ' ) %}
 	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
@@ -36,7 +38,7 @@
 	    {% do temp.append('   cycle_date ') %}
 	    {% do temp.append('   , as_of_date ') %}
 	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
-	    {% do temp.append('   from portfolio__' ~ model_name ) %}
+	    {% do temp.append('   from portfolio.' ~ model_name ) %}
 	    {% do temp.append(';') %}
 
 	{% endfor %}

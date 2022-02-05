@@ -55,7 +55,7 @@
 		    where 
 			database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 			and stage_table_name='{{model_name}}' 
-			and is_public=1 and comments is null
+			and is_public=1 and has_column_issue=0 and has_table_issue=0
 		    order by column_order
 		{%- endset -%}
 

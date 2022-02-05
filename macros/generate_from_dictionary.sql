@@ -3,6 +3,73 @@
     dictionary must match the same naming style.
 #}
 
+# Assumes that the external tables have been updated to include the most recent data.
+# Uses an insert into to pull data through all layers in the stack and populate tables in
+# the public schema. Should generate the best performance for public usage.
+
+{% macro generate_insert_into_from_dictionaty(change_only='false') %}
+
+    {% set temp=[] %}
+    {% do temp.append('') %}
+
+	{%- set query -%}
+	    select  
+		DISTINCT stage_table_name 
+	    from internal.dictionary 
+	    where 
+		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+		and is_public=1 and comments is null
+	    order by stage_table_name
+	{%- endset -%}
+	{%- set tables = run_query(query) -%}    
+
+	{% for tbl in tables %}
+	    {% set model_name = tbl.STAGE_TABLE_NAME %}
+	    {% do temp.append('truncate table public__' ~ model_name  ) %}
+	    {% do temp.append('INSERT INTO  public__' ~ model_name  ~ ' ( ' ) %}
+	    {% do temp.append('   cycle_date ' ) %}
+	    {% do temp.append('   , as_of_date ' ) %}
+		{%- set query -%}
+		    select  
+			stage_column_name, source_column_name  
+		    from internal.dictionary 
+		    where 
+			database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+			and stage_table_name='{{model_name}}' 
+			and is_public=1 and comments is null
+		    order by column_order
+		{%- endset -%}
+
+		{%- set columns = run_query(query) -%}    
+		{%- for column in columns %}
+	    {% do temp.append('   , ' ~ column.STAGE_COLUMN_NAME ) %}
+		{%- endfor %}
+	    {% do temp.append(')') %}
+	    {% do temp.append('Select ') %}
+	    {% do temp.append('   cycle_date ') %}
+	    {% do temp.append('   , as_of_date ') %}
+		{%- set query -%}
+		    select  
+			stage_column_name, source_column_name  
+		    from internal.dictionary 
+		    where 
+			database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+			and stage_table_name='{{model_name}}' 
+			and is_public=1 and comments is null
+		    order by column_order
+		{%- endset -%}
+
+		{%- set columns = run_query(query) -%}    
+		{%- for column in columns %}
+		{% do temp.append('   , ' ~ column.STAGE_COLUMN_NAME ) %}
+		{%- endfor %}
+	    {% do temp.append('   from portfolio__' ~ model_name ) %}
+	    {% do temp.append(';') %}
+
+	{% endfor %}
+{% endmacro %}
+--
+
 {% macro generate_csv_file_format() %}
     {% set file_format_name = var('dictionary_file_format_name') %}
     {% set temp=[] %}

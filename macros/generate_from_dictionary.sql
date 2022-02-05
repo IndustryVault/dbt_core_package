@@ -26,7 +26,7 @@
 
 	{% for tbl in tables %}
 	    {% set model_name = tbl.STAGE_TABLE_NAME %}
-	    {% do temp.append('truncate table public__' ~ model_name  ) %}
+	    {% do temp.append('truncate table public__' ~ model_name ~ ';' ) %}
 	    {% do temp.append('INSERT INTO  public__' ~ model_name  ~ ' ( ' ) %}
 	    {% do temp.append('   cycle_date ' ) %}
 	    {% do temp.append('   , as_of_date ' ) %}

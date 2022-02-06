@@ -17,7 +17,7 @@
 	{%- set query -%}
 	select  
 		DISTINCT stage_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
-	from bde.internal.dictionary 
+	from internal.dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 		and is_public=1 and has_column_issue=0 and has_table_issue=0

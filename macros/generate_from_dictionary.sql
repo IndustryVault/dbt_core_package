@@ -7,14 +7,12 @@
 # Uses an insert into to pull data through all layers in the stack and populate tables in
 # the public schema. Should generate the best performance for public usage.
 
-{% macro generate_insert_into_from_dictionary(from_schema='historical', to_schema='portfolio', change_only='false') %}
+{% macro generate_insert_into_from_dictionary() %}
+   {% set temp=[] %}
+   {% do temp.append('') %}
+   {% do temp.append('use database ' ~ var('dictionary_database') ~';') %}
 
-    {% set temp=[] %}
-    {% do temp.append('') %}
-    {% do temp.append('use database ' ~ var('dictionary_database') ~';') %}
-    {% do temp.append('use schema public;') %}
-
-	{%- set query -%}
+   {%- set query -%}
 	select  
 		DISTINCT stage_table_name, source_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
 	from internal.dictionary 
@@ -23,22 +21,22 @@
 		and has_column_issue=0 and has_table_issue=0
 	group by stage_table_name, source_table_name
 	order by stage_table_name
-	{%- endset -%}
-	{%- set tables = run_query(query) -%}   
-	{% for tbl in tables %}
-	    {% set model_name = tbl.STAGE_TABLE_NAME %}
-	    {% do temp.append('alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
-	    {% do temp.append('insert into portfolio.' ~ model_name ) %}
-	    {% do temp.append('(' ) %}
-	    {% do temp.append('   Select distinct cycle_date from portfolio.vw_' ~ model_name ) %}
-	    {% do temp.append('   except' ) %}
-	    {% do temp.append('   Select distinct cycle_date from portfolio.' ~ model_name ) %}
-	    {% do temp.append(');' ) %}
-	{% endfor %}
+   {%- endset -%}
+   {%- set tables = run_query(query) -%}   
+   {% for tbl in tables %}
+      {% set model_name = tbl.STAGE_TABLE_NAME %}
+      {% do temp.append('alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
+      {% do temp.append('insert into portfolio.' ~ model_name ) %}
+      {% do temp.append('(' ) %}
+      {% do temp.append('   Select distinct cycle_date from portfolio.vw_' ~ model_name ) %}
+      {% do temp.append('   except' ) %}
+      {% do temp.append('   Select distinct cycle_date from portfolio.' ~ model_name ) %}
+      {% do temp.append(');' ) %}
+   {% endfor %}
 
-    {% set results = temp | join ('\n') %}
-    {{ log(results, info=True) }}
-    {% do return(results) %}
+   {% set results = temp | join ('\n') %}
+   {{ log(results, info=True) }}
+   {% do return(results) %}
 {% endmacro %}
 --
 

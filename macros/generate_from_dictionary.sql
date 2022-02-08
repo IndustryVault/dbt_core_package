@@ -27,6 +27,8 @@
       {% set model_name = tbl.STAGE_TABLE_NAME %}
       {% do temp.append('alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
       {% do temp.append('insert into portfolio.' ~ model_name ) %}
+      {% do temp.append('Select * from portfolio.vw_' ~ model_name ) %}
+      {% do temp.append('where cycle_date IN' ) %}
       {% do temp.append('(' ) %}
       {% do temp.append('   Select distinct cycle_date from portfolio.vw_' ~ model_name ) %}
       {% do temp.append('   except' ) %}

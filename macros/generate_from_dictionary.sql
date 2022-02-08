@@ -7,7 +7,7 @@
 # Uses an insert into to pull data through all layers in the stack and populate tables in
 # the public schema. Should generate the best performance for public usage.
 
-{% macro generate_insert_into_from_dictionary(change_only='false') %}
+{% macro generate_insert_into_from_dictionary(from_schema='historical', to_schema='portfolio', change_only='false') %}
 
     {% set temp=[] %}
     {% do temp.append('') %}
@@ -28,8 +28,8 @@
 
 	{% for tbl in tables %}
 	    {% set model_name = tbl.STAGE_TABLE_NAME %}
-	    {% do temp.append('truncate table public.' ~ model_name ~ ';' ) %}
-	    {% do temp.append('INSERT INTO  public.' ~ model_name  ~ ' ( ' ) %}
+	    {% do temp.append('truncate table ' ~ to_schema ~ '.' ~ model_name ~ ';' ) %}
+	    {% do temp.append('INSERT INTO ' ~ to_schema ~ '.' ~ model_name  ~ ' ( ' ) %}
 	    {% do temp.append('   cycle_date ' ) %}
 	    {% do temp.append('   , as_of_date ' ) %}
 	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
@@ -38,7 +38,7 @@
 	    {% do temp.append('   cycle_date ') %}
 	    {% do temp.append('   , as_of_date ') %}
 	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
-	    {% do temp.append('   from portfolio.' ~ model_name ) %}
+	    {% do temp.append('   from ' ~ from_schema ~ '.' ~ model_name ) %}
 	    {% do temp.append(';') %}
 
 	{% endfor %}

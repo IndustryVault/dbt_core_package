@@ -21,7 +21,7 @@
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 		and has_column_issue=0 and has_table_issue=0
-	group by stage_table_name
+	group by stage_table_name, source_table_name
 	order by stage_table_name
 	{%- endset -%}
 	{%- set tables = run_query(query) -%}   

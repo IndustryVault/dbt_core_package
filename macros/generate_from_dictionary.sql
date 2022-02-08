@@ -24,21 +24,18 @@
 	group by stage_table_name
 	order by stage_table_name
 	{%- endset -%}
-	{%- set tables = run_query(query) -%}    
+	{%- set tables = run_query(query) -%}   
+	{% set str = "INSERT INTO portfolio.{@table_name} " +
 
 	{% for tbl in tables %}
 	    {% set model_name = tbl.STAGE_TABLE_NAME %}
-	    {% do temp.append('truncate table ' ~ to_schema ~ '.' ~ model_name ~ ';' ) %}
-	    {% do temp.append('INSERT INTO ' ~ to_schema ~ '.' ~ model_name  ~ ' ( ' ) %}
-	    {% do temp.append('   cycle_date ' ) %}
-	    {% do temp.append('   , as_of_date ' ) %}
-	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
-	    {% do temp.append(')') %}
-	    {% do temp.append('Select ') %}
-	    {% do temp.append('   cycle_date ') %}
-	    {% do temp.append('   , as_of_date ') %}
-	    {% do temp.append('   , ' ~ tbl.COLUMN_LIST ) %}
-	    {% do temp.append('   from ' ~ from_schema ~ '.' ~ model_name ) %}
+	    {% do temp.append('alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
+	    {% do temp.append('insert into portfolio.' ~ model_name ) %}
+	    {% do temp.append('(' ) %}
+	    {% do temp.append('   Select distinct cycle_date from portfolio.vw_' ~ model_name ) %}
+	    {% do temp.append('   except' ) %}
+	    {% do temp.append('   Select distinct cycle_date from portfolio.' ~ model_name ) %}
+	    {% do temp.append(')' ) %}
 	    {% do temp.append(';') %}
 
 	{% endfor %}

@@ -16,17 +16,15 @@
 
 	{%- set query -%}
 	select  
-		DISTINCT stage_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
+		DISTINCT stage_table_name, source_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
 	from internal.dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-		and is_public=1 and has_column_issue=0 and has_table_issue=0
+		and has_column_issue=0 and has_table_issue=0
 	group by stage_table_name
 	order by stage_table_name
 	{%- endset -%}
 	{%- set tables = run_query(query) -%}   
-	{% set str = "INSERT INTO portfolio.{@table_name} " +
-
 	{% for tbl in tables %}
 	    {% set model_name = tbl.STAGE_TABLE_NAME %}
 	    {% do temp.append('alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
@@ -35,9 +33,7 @@
 	    {% do temp.append('   Select distinct cycle_date from portfolio.vw_' ~ model_name ) %}
 	    {% do temp.append('   except' ) %}
 	    {% do temp.append('   Select distinct cycle_date from portfolio.' ~ model_name ) %}
-	    {% do temp.append(')' ) %}
-	    {% do temp.append(';') %}
-
+	    {% do temp.append(');' ) %}
 	{% endfor %}
 
     {% set results = temp | join ('\n') %}

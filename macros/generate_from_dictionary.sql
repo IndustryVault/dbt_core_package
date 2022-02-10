@@ -29,7 +29,7 @@
     AS 
         alter external table external.{@table_name} refresh;
     {% endset %}
-    {{ log(template | replace('{%table_name}', 'TOUCHDOWN'), info=True) }}
+    {{ log(template | replace('{%table_name}', 'TOUCHDOWN'), info=False) }}
    {%- set tables = run_query(query) -%}   
    {% for tbl in tables %}
       {% set model_name = tbl.STAGE_TABLE_NAME %}

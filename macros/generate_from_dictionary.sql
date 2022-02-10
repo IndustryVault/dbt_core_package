@@ -25,7 +25,7 @@
    {% set template %}
 	create or replace task bde_external_{@table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
-		schedule='USING CRON 0 21 * * * EST'
+		schedule='{{ var('dictionary_load_start') }}'
     AS 
         alter external table external.{@table_name} refresh;
 		

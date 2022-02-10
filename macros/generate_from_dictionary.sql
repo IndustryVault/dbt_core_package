@@ -41,11 +41,10 @@
 			Select distinct cycle_date from portfolio.{@table_name}
 		);
     {% endset %}
-    {{ log(template | replace('{%table_name}', 'TOUCHDOWN'), info=True) }}
    {%- set tables = run_query(query) -%}   
    {% for tbl in tables %}
       {% set model_name = tbl.STAGE_TABLE_NAME %}
-      {% do temp.append(template | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
+      {% do temp.append(template | string | replace('{@table_name}', tbl.STAGE_TABLE_NAME) ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

@@ -23,7 +23,7 @@
 	FROM TABLE(result_scan(last_query_id())) ;
 	
 	// This is a very slow query
-	Select * From snowflake_account_usage.task_history where database={{ var('dictionary_database') | UPPER }} LIMIT 10;
+	Select * From snowflake_account_usage.task_history where database={{ var('dictionary_database') | upper }} LIMIT 10;
    */
    use database {{ var('dictionary_database') }};
    set schedule = '{{ var('dictionary_load_start') }}'

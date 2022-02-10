@@ -9,8 +9,11 @@
 
 {% macro generate_incremental_load_tasks_from_dictionary() %}
    {% set temp=[] %}
-   {% do temp.append('') %}
-   {% do temp.append('use database ' ~ var('dictionary_database') ~';') %}
+   {% set header %}
+   use database {{ var('dictionary_database') }};
+   set schedule = '{{ var('dictionary_load_start') }}'
+   {%- endset -%}
+   {% do temp.append(header | string ) %}
 
    {%- set query -%}
 	select  
@@ -26,11 +29,12 @@
 	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
 		WAREHOUSE=INGESTION_WH
-		schedule='{{ var('dictionary_load_start') }}'
+		schedule=$schedule
     AS 
         alter external table external.{@table_name} refresh;
 		
 	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load
+		WAREHOUSE=INGESTION_WH
 		AFTER {{ var('dictionary_database') }}_external_{@table_name}_refresh
 	AS
 		insert into portfolio.{@table_name}
@@ -41,8 +45,8 @@
 			except
 			Select distinct cycle_date from portfolio.{@table_name}
 		);
-	alter task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load resume;
-	alter task {{ var('dictionary_database') }}_external_{@table_name}_refresh resume;
+--	alter task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load resume;
+--	alter task {{ var('dictionary_database') }}_external_{@table_name}_refresh resume;
     {% endset %}
    {%- set tables = run_query(query) -%}   
    

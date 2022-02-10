@@ -23,9 +23,9 @@
 	order by stage_table_name
    {%- endset -%}
    {% set template %}
-   	create or replace task bde_external_{@table_name}_refresh
-        ALLOW_OVERLAPPING_EXECUTION=FALSE;
-        schedule='0 6 * * * EST'
+	create or replace task bde_external_{@table_name}_refresh
+		ALLOW_OVERLAPPING_EXECUTION=FALSE;
+		schedule='0 6 * * * EST'
     AS 
         alter external table external.{@table_name} refresh;
 		
@@ -40,8 +40,11 @@
 			except
 			Select distinct cycle_date from portfolio.{@table_name}
 		);
+	alter task bde_external_{@table_name}_incremental_load resume;
+	alter task bde_external_{@table_name}_refresh resume;
     {% endset %}
    {%- set tables = run_query(query) -%}   
+   
    {% for tbl in tables %}
       {% set model_name = tbl.STAGE_TABLE_NAME %}
       {% do temp.append(template | string | replace('{@table_name}', tbl.STAGE_TABLE_NAME) ) %}

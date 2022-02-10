@@ -50,12 +50,7 @@
 			Select distinct cycle_date from portfolio.{@stage_table_name}
 		);
     {% endset %}
-    {% endset %}
-    {% set task_resume %}
-    	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load resume;
-    {%- set query -%}
-    {% set task_suspend %}
-    	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load suspend;
+
     {%- set query -%}
 	select  
 		DISTINCT stage_table_name, source_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list

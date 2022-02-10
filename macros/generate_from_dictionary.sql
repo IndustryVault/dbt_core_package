@@ -154,7 +154,7 @@
         {% endif %}
         {% do sources_yaml.append('(') %}
         {% if table_only == 'false' %}
-            {% do sources_yaml.append('    cycle_date date as to_date(SPLIT_PART(metadata$filename, '/', 3), \'YYYY-MM-DD\')') %}
+            {% do sources_yaml.append('    cycle_date date as to_date(SPLIT_PART(metadata$filename, \'/\', 3), \'YYYY-MM-DD\')') %}
         {% else %}
             {% do sources_yaml.append('    cycle_date date') %}
         {% endif %}

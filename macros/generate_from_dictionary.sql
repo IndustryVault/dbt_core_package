@@ -193,10 +193,10 @@
 
     {% set file_pattern = var('dictionary_file_pattern') %}
         {% do sources_yaml.append(')') %}
+	{% do sources_yaml.append(' PARTITION BY (cycle_date) %}
         {% if table_only == 'false' %}
             {% do sources_yaml.append('WITH') %}
             {% do sources_yaml.append(' LOCATION = @' ~ external_stage ) %}
-	    {% do sources_yaml.append(' PARTITION BY (cycle_date) %}
             {% do sources_yaml.append(' FILE_FORMAT = ' ~ file_format_name) %}
             {% do sources_yaml.append(' PATTERN = \'.*/{@upper_table_name}{@file_pattern}\'' | replace('{@upper_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@file_pattern}', file_pattern)) %}
         {% endif %}

@@ -9,23 +9,27 @@
 
 {% macro generate_incremental_load_tasks_from_dictionary() %}
    {% set temp=[] %}
+   
    {% set header %}
+   /*
+   // execute this command first then execute the lower commands that are based on the last_query_id.
+	show tasks  like '{{ var('dictionary_database') }}_%';
+	show tasks  like '{{ var('dictionary_database') }}_%_REFRESH';
+	show tasks  like '{{ var('dictionary_database') }}_%';
+
+	Select LISTAGG(REPLACE('DROP TASK IF EXISTS {@TASK_NAME};' || CHAR(13), '{@TASK_NAME}', CONCAT_WS('.',"database_name","schema_name","name")), '') as drop_task
+		       FROM TABLE(result_scan(last_query_id()));
+
+
+	Select LISTAGG(REPLACE('ALTER TASK {@TASK_NAME} suspend;' || CHAR(13), '{@TASK_NAME}', CONCAT_WS('.',"database_name","schema_name","name")), '') as drop_task
+	 FROM TABLE(result_scan(last_query_id())) ;
+   */
    use database {{ var('dictionary_database') }};
    set schedule = '{{ var('dictionary_load_start') }}'
    {%- endset -%}
    {% do temp.append(header | string ) %}
 
-   {%- set query -%}
-	select  
-		DISTINCT stage_table_name, source_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
-	from internal.dictionary 
-	where 
-		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-		and has_column_issue=0 and has_table_issue=0
-	group by stage_table_name, source_table_name
-	order by stage_table_name
-   {%- endset -%}
-   {% set template %}
+   {% set task_template %}
 	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
 		WAREHOUSE=INGESTION_WH
@@ -45,14 +49,27 @@
 			except
 			Select distinct cycle_date from portfolio.{@stage_table_name}
 		);
---	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load resume;
---	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh resume;
     {% endset %}
+    {% endset %}
+    {% set task_resume %}
+    	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load resume;
+    {%- set query -%}
+    {% set task_suspend %}
+    	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load suspend;
+    {%- set query -%}
+	select  
+		DISTINCT stage_table_name, source_table_name, listagg(stage_column_name, ',') within group ( order by column_order) as column_list
+	from internal.dictionary 
+	where 
+		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+		and has_column_issue=0 and has_table_issue=0
+	group by stage_table_name, source_table_name
+	order by stage_table_name
+   {%- endset -%}
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
-      {% set model_name = tbl.STAGE_TABLE_NAME %}
-      {% do temp.append(template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
+      {% do temp.append(task_template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

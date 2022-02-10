@@ -22,6 +22,14 @@
 	group by stage_table_name, source_table_name
 	order by stage_table_name
    {%- endset -%}
+   {% set template %}
+   	create or replace task bde_external_{@table_name}_refresh
+        ALLOW_OVERLAPPING_EXECUTION=FALSE;
+        schedule='0 6 * * * EST'
+    AS 
+        alter external table external.{@table_name} refresh;
+    {% endset %}
+    {{ log(template | replace('{%table_name}', 'TOUCHDOWN'), info=True) }}
    {%- set tables = run_query(query) -%}   
    {% for tbl in tables %}
       {% set model_name = tbl.STAGE_TABLE_NAME %}

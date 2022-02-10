@@ -26,33 +26,33 @@
 	order by stage_table_name
    {%- endset -%}
    {% set template %}
-	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_refresh
+	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
 		WAREHOUSE=INGESTION_WH
 		schedule=$schedule
     AS 
-        alter external table external.{@table_name} refresh;
+        alter external table external.{@source_table_name} refresh;
 		
-	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load
+	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load
 		WAREHOUSE=INGESTION_WH
-		AFTER {{ var('dictionary_database') }}_external_{@table_name}_refresh
+		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
 	AS
-		insert into portfolio.{@table_name}
-		Select * from portoflio.vw_{@table_name}
+		insert into portfolio.{@stage_table_name}
+		Select * from portoflio.vw_{@stage_table_name}
 		where cycle_date IN 
 		(
-			Select distinct cycle_date from portfolio.vw_{@table_name}
+			Select distinct cycle_date from portfolio.vw_{@stage_table_name}
 			except
-			Select distinct cycle_date from portfolio.{@table_name}
+			Select distinct cycle_date from portfolio.{@stage_table_name}
 		);
---	alter task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load resume;
---	alter task {{ var('dictionary_database') }}_external_{@table_name}_refresh resume;
+--	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load resume;
+--	alter task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh resume;
     {% endset %}
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
       {% set model_name = tbl.STAGE_TABLE_NAME %}
-      {% do temp.append(template | string | replace('{@table_name}', tbl.STAGE_TABLE_NAME) ) %}
+      {% do temp.append(template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

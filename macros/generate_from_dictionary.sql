@@ -28,20 +28,24 @@
         schedule='0 6 * * * EST'
     AS 
         alter external table external.{@table_name} refresh;
+		
+	create or replace task bde_external_{@table_name}_incremental_load
+		AFTER bde_external_{@table_name}_refresh
+	AS
+		insert into portfolio.{@table_name}
+		Select * from portoflio.vw_{@table_name}
+		where cycle_date IN 
+		(
+			Select distinct cycle_date from portfolio.vw_{@table_name}
+			except
+			Select distinct cycle_date from portfolio.{@table_name}
+		);
     {% endset %}
-    {{ log(template | replace('{%table_name}', 'TOUCHDOWN'), info=False) }}
+    {{ log(template | replace('{%table_name}', 'TOUCHDOWN'), info=True) }}
    {%- set tables = run_query(query) -%}   
    {% for tbl in tables %}
       {% set model_name = tbl.STAGE_TABLE_NAME %}
-      {% do temp.append('alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
-      {% do temp.append('insert into portfolio.' ~ model_name ) %}
-      {% do temp.append('Select * from portfolio.vw_' ~ model_name ) %}
-      {% do temp.append('where cycle_date IN' ) %}
-      {% do temp.append('(' ) %}
-      {% do temp.append('   Select distinct cycle_date from portfolio.vw_' ~ model_name ) %}
-      {% do temp.append('   except' ) %}
-      {% do temp.append('   Select distinct cycle_date from portfolio.' ~ model_name ) %}
-      {% do temp.append(');' ) %}
+      {% do temp.append(template | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

@@ -24,8 +24,8 @@
    {%- endset -%}
    {% set template %}
 	create or replace task bde_external_{@table_name}_refresh
-		ALLOW_OVERLAPPING_EXECUTION=FALSE;
-		schedule='0 6 * * * EST'
+		ALLOW_OVERLAPPING_EXECUTION=FALSE
+		schedule='0 20 * * * EST'
     AS 
         alter external table external.{@table_name} refresh;
 		

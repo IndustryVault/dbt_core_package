@@ -31,7 +31,7 @@
         alter external table external.{@table_name} refresh;
 		
 	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load
-		AFTER bde_external_{@table_name}_refresh
+		AFTER {{ var('dictionary_database') }}_external_{@table_name}_refresh
 	AS
 		insert into portfolio.{@table_name}
 		Select * from portoflio.vw_{@table_name}

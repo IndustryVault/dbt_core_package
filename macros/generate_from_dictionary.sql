@@ -15,14 +15,15 @@
    // execute this command first then execute the lower commands that are based on the last_query_id.
 	show tasks  like '{{ var('dictionary_database') }}_%';
 	show tasks  like '{{ var('dictionary_database') }}_%_REFRESH';
-	show tasks  like '{{ var('dictionary_database') }}_%';
 
 	Select LISTAGG(REPLACE('DROP TASK IF EXISTS {@TASK_NAME};' || CHAR(13), '{@TASK_NAME}', CONCAT_WS('.',"database_name","schema_name","name")), '') as drop_task
-		       FROM TABLE(result_scan(last_query_id()));
-
+	FROM TABLE(result_scan(last_query_id()));
 
 	Select LISTAGG(REPLACE('ALTER TASK {@TASK_NAME} suspend;' || CHAR(13), '{@TASK_NAME}', CONCAT_WS('.',"database_name","schema_name","name")), '') as drop_task
-	 FROM TABLE(result_scan(last_query_id())) ;
+	FROM TABLE(result_scan(last_query_id())) ;
+	
+	// This is a very slow query
+	Select * From snowflake_account_usage.task_history where database={{ var('dictionary_database') | UPPER }} LIMIT 10;
    */
    use database {{ var('dictionary_database') }};
    set schedule = '{{ var('dictionary_load_start') }}'
@@ -195,6 +196,7 @@
         {% if table_only == 'false' %}
             {% do sources_yaml.append('WITH') %}
             {% do sources_yaml.append(' LOCATION = @' ~ external_stage ) %}
+	    {% do sources_yaml.append(' PARTITION BY (cycle_date) %}
             {% do sources_yaml.append(' FILE_FORMAT = ' ~ file_format_name) %}
             {% do sources_yaml.append(' PATTERN = \'.*/{@upper_table_name}{@file_pattern}\'' | replace('{@upper_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@file_pattern}', file_pattern)) %}
         {% endif %}

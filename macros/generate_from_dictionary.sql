@@ -154,7 +154,7 @@
         {% endif %}
         {% do sources_yaml.append('(') %}
         {% if table_only == 'false' %}
-            {% do sources_yaml.append('    cycle_date date as to_date(CONCAT(substring(metadata$filename, charindex(\'/fay/\',metadata$filename)+5, 4), substring(metadata$filename, charindex(\'/fay/\',metadata$filename)+10, 2), substring(metadata$filename, charindex(\'/fay/\',metadata$filename)+13, 2)), \'YYYYMMDD\')') %}
+            {% do sources_yaml.append('    cycle_date date as to_date(SPLIT_PART(metadata$filename, '/', 3), \'YYYY-MM-DD\')') %}
         {% else %}
             {% do sources_yaml.append('    cycle_date date') %}
         {% endif %}

@@ -7,7 +7,7 @@
 # Uses an insert into to pull data through all layers in the stack and populate tables in
 # the public schema. Should generate the best performance for public usage.
 
-{% macro generate_insert_into_from_dictionary() %}
+{% macro generate_incremental_load_tasks_from_dictionary() %}
    {% set temp=[] %}
    {% do temp.append('') %}
    {% do temp.append('use database ' ~ var('dictionary_database') ~';') %}

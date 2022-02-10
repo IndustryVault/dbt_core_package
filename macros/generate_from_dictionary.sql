@@ -25,6 +25,7 @@
    {% set template %}
 	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
+		WAREHOUSE=INGESTION_WH
 		schedule='{{ var('dictionary_load_start') }}'
     AS 
         alter external table external.{@table_name} refresh;

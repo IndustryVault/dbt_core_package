@@ -23,13 +23,13 @@
 	order by stage_table_name
    {%- endset -%}
    {% set template %}
-	create or replace task bde_external_{@table_name}_refresh
+	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
 		schedule='{{ var('dictionary_load_start') }}'
     AS 
         alter external table external.{@table_name} refresh;
 		
-	create or replace task bde_external_{@table_name}_incremental_load
+	create or replace task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load
 		AFTER bde_external_{@table_name}_refresh
 	AS
 		insert into portfolio.{@table_name}
@@ -40,8 +40,8 @@
 			except
 			Select distinct cycle_date from portfolio.{@table_name}
 		);
-	alter task bde_external_{@table_name}_incremental_load resume;
-	alter task bde_external_{@table_name}_refresh resume;
+	alter task {{ var('dictionary_database') }}_external_{@table_name}_incremental_load resume;
+	alter task {{ var('dictionary_database') }}_external_{@table_name}_refresh resume;
     {% endset %}
    {%- set tables = run_query(query) -%}   
    

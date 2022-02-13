@@ -298,7 +298,6 @@
 
     {% set sources_yaml=[] %}
 
-    {% do sources_yaml.append('schema name= [' ~ schema_name ~ ']') %}
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('version: 2') %}
     {% do sources_yaml.append('') %}
@@ -311,7 +310,7 @@
 
     {% do sources_yaml.append('    tables:') %}
     
-    {% if schema_name=='public' %}
+    {% if schema_name | string =='public' %}
     	{% set public_filter = ' AND is_public=1 ' %}
     {% else %}
         {% set public_filter = '' %}

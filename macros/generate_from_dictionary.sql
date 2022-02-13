@@ -310,9 +310,10 @@
 
     {% do sources_yaml.append('    tables:') %}
     
-    {% set public_filter = '  ' %}
     {% if schema_name=='public' %}
     	{% set public_filter = ' AND is_public=1 ' %}
+    {% else %}
+        {% set public_filter = '' %}
     {% endif %}
     {% set query %}
     	select DISTINCT source_table_name, stage_table_name 

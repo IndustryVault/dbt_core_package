@@ -294,7 +294,7 @@
 
 {% endmacro %}
 ---
-{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, schema_name='external') %}
+{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, schema_name='external', filter='') %}
 
     {% set sources_yaml=[] %}
 
@@ -310,18 +310,12 @@
 
     {% do sources_yaml.append('    tables:') %}
     
-    {% set test='public' %}
-    {% if schema_name | lower == test | lower %}
-    	{% set public_filter = ' AND is_public=1 ' %}
-    {% else %}
-        {% set public_filter = '' %}
-    {% endif %}
     {% set query %}
     	select DISTINCT source_table_name, stage_table_name 
 	from internal.dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-		{{ public_filter }}
+		{{ filter }}
 	order by stage_table_name
     {% endset %}
     {% set tables = run_query(query) %}

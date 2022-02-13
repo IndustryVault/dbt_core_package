@@ -310,7 +310,7 @@
 
     {% do sources_yaml.append('    tables:') %}
     
-    {% set public_filter = '  '
+    {% set public_filter = '  ' %}
     {% if public_only %}
     	{% set public_filter = ' AND is_public=1 ' %}
     {% endif %}

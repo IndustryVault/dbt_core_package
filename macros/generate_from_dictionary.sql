@@ -326,10 +326,10 @@
 
     {% for tbl in tables %}
     	{% if schema_name=='external' %}
-		{% do sources_yaml.append('      - name: ' ~  'external__' ~ tbl.SOURCE_TABLE_NAME | lower) %}
+		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__'  ~ tbl.SOURCE_TABLE_NAME | lower) %}
 		{% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}	
 	{% else %}
-    		{% set table_name = schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower %}
+ 		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower) %}
 	{% endif %}
         {% if include_external %}
             {% do sources_yaml.append('        external: ' ) %}

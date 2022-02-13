@@ -310,7 +310,8 @@
 
     {% do sources_yaml.append('    tables:') %}
     
-    {% if schema_name | string() == 'public' | string() %}
+    {% set test='public' %}
+    {% if schema_name | lower == test | lower %}
     	{% set public_filter = ' AND is_public=1 ' %}
     {% else %}
         {% set public_filter = '' %}

@@ -294,7 +294,7 @@
 
 {% endmacro %}
 ---
-{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False) %}
+{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, public_only=false) %}
 
     {% set sources_yaml=[] %}
 
@@ -309,8 +309,19 @@
     {% do sources_yaml.append('    loader:  Manual') %}
 
     {% do sources_yaml.append('    tables:') %}
-
-    {% set tables=get_tables_from_dictionary() %}
+    
+    {% set public_filter = '  '
+    {% if public_only %}
+    	{% set public_filter = ' AND is_public=1 '
+    {% set query %}
+    	select DISTINCT source_table_name, stage_table_name 
+	from internal.dictionary 
+	where 
+		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+		{{ public_filter }}
+	order by stage_table_name
+    {% endset %}
+    {% set tables = run_query(query) %}
 
     {% for tbl in tables %}
         {% do sources_yaml.append('      - name: ' ~ 'external__' ~ tbl.SOURCE_TABLE_NAME | lower) %}

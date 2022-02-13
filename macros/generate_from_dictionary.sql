@@ -350,7 +350,8 @@
                         database_name='{{ var('dictionary_database') }}' 
                         and version_name='{{ var('dictionary_database_version') }}' 
                         and source_table_name='{{tbl.SOURCE_TABLE_NAME}}' 
-                    order by column_order
+			{{ filter }}
+			order by column_order
                 {% endset %}
 
             {% set columns=run_query(query) %}

@@ -329,9 +329,8 @@
 		{% do sources_yaml.append('      - name: ' ~  'external__' ~ tbl.SOURCE_TABLE_NAME | lower) %}
 		{% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}	
 	{% else %}
-    		{% set table_name = schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME %}
+    		{% set table_name = schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower %}
 	{% endif %}
-        {% do sources_yaml.append('      - name: ' ~  tbl.STAGE_TABLE_NAME | lower) %}
         {% if include_external %}
             {% do sources_yaml.append('        external: ' ) %}
             {% do sources_yaml.append('          location:  "@raw.snowplow.snowplow"' ) %}

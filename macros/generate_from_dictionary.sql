@@ -294,7 +294,7 @@
 
 {% endmacro %}
 ---
-{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, public_only=false) %}
+{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, schema_name='external') %}
 
     {% set sources_yaml=[] %}
 
@@ -311,7 +311,7 @@
     {% do sources_yaml.append('    tables:') %}
     
     {% set public_filter = '  ' %}
-    {% if public_only %}
+    {% if schema_name=='public' %}
     	{% set public_filter = ' AND is_public=1 ' %}
     {% endif %}
     {% set query %}
@@ -325,8 +325,13 @@
     {% set tables = run_query(query) %}
 
     {% for tbl in tables %}
-        {% do sources_yaml.append('      - name: ' ~ 'external__' ~ tbl.SOURCE_TABLE_NAME | lower) %}
-        {% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}
+    	{% if schema_name=='external' %}
+		{% do sources_yaml.append('      - name: ' ~  'external__' ~ tbl.SOURCE_TABLE_NAME | lower) %}
+		{% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}	
+	{% else %}
+    		{% set table_name = schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME %}
+	{% endif %}
+        {% do sources_yaml.append('      - name: ' ~  tbl.STAGE_TABLE_NAME | lower) %}
         {% if include_external %}
             {% do sources_yaml.append('        external: ' ) %}
             {% do sources_yaml.append('          location:  "@raw.snowplow.snowplow"' ) %}
@@ -355,7 +360,12 @@
 
             {% set columns=run_query(query) %}
             {% for column in columns %}
-                {% do sources_yaml.append('          - name: ' ~ column.SOURCE_COLUMN_NAME ) %}
+		{% if schema_name=='external' %}
+			{% set column_name_name = column.SOURCE_COLUMN_NAME %}
+		{% else %}
+			{% set column_name = column.STAGE_COLUMN_NAME %}
+		{% endif %}
+		{% do sources_yaml.append('          - name: ' ~ column_name ) %}
                 {% do sources_yaml.append('            data_type: ' ~ column.STAGE_COLUMN_TYPE ) %}
                 {% if include_descriptions %}
                     {% do sources_yaml.append('            description: "' ~ column.STAGE_COLUMN_DESCRIPTION + '"' ) %}

@@ -313,6 +313,7 @@
     {% set public_filter = '  '
     {% if public_only %}
     	{% set public_filter = ' AND is_public=1 '
+    {% endif %}
     {% set query %}
     	select DISTINCT source_table_name, stage_table_name 
 	from internal.dictionary 

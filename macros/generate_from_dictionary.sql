@@ -5,9 +5,10 @@
 
 # Assumes that the external tables have been updated to include the most recent data.
 # Uses an insert into to pull data through all layers in the stack and populate tables in
-# the public schema. Should generate the best performance for public usage.
+# the portfolio schema. Should generate the good performance for public usage as well as allowing
+# for easy change.
 
-{% macro generate_incremental_load_tasks_from_dictionary() %}
+{% macro generate_incremental_load_tasks_from_dictionary(include_tasks='true') %}
    {% set temp=[] %}
    
    {% set header %}
@@ -28,8 +29,9 @@
    use database {{ var('dictionary_database') }};
    set schedule = '{{ var('dictionary_load_start') }}'
    {%- endset -%}
-   {% do temp.append(header | string ) %}
 
+   {% do temp.append(header | string ) %}
+   {% if include_tasks = 'true' %}
    {% set task_template %}
 	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
@@ -46,11 +48,26 @@
 		Select * from portfolio.vw_{@stage_table_name}
 		where cycle_date IN 
 		(
-			Select distinct cycle_date from portfolio.vw_{@stage_table_name}
+			Select distinct as_of_date from portfolio.vw_{@stage_table_name}
 			except
-			Select distinct cycle_date from portfolio.{@stage_table_name}
+			Select distinct as_of_date from portfolio.{@stage_table_name}
 		);
     {% endset %}
+       {% else %}
+    {% set task_template %}
+        alter external table external.{@source_table_name} refresh;
+
+	insert into portfolio.{@stage_table_name}
+	Select * from portfolio.vw_{@stage_table_name}
+	where cycle_date IN 
+	(
+		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
+		except
+		Select distinct as_of_date from portfolio.{@stage_table_name}
+	);
+       
+    {% endset %}      
+      {% endif %}
 
     {%- set query -%}
 	select  

@@ -369,7 +369,7 @@
                 
                 {% set query %}
                     select  
-                        source_column_name, source_column_type, stage_column_description, stage_column_name, lower(stage_column_type) stage_column_type
+                        source_column_name, stage_column_description, stage_column_name, lower(stage_column_type) stage_column_type
                     from internal.dictionary 
                     where 
                         database_name='{{ var('dictionary_database') }}' 

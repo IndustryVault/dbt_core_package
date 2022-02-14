@@ -33,6 +33,7 @@
    {% do temp.append(header | string ) %}
    {% if include_tasks == 'true' %}
    {% set task_template %}
+   	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
 	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
 		WAREHOUSE=INGESTION_WH
@@ -40,6 +41,7 @@
     AS 
         alter external table external.{@source_table_name} refresh;
 		
+   	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
 	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load
 		WAREHOUSE=INGESTION_WH
 		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh

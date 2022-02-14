@@ -328,7 +328,7 @@
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('sources:') %}
     {% do sources_yaml.append('  - name: ' ~ var('dictionary_database') | lower ) %}
-    {% do sources_yaml.append('    description: "Black Knight Financial Services (BKFS) supplied export of the MSP system. Received daily except for Sunday and Monday."') %}
+    {% do sources_yaml.append('    description: "' ~ var('dictionary_source_description') ~ '"') %}
     {% do sources_yaml.append('    database: "{{ var(''dictionary_database'', target.database) }}"') %}
     {% do sources_yaml.append('    schema:  "{{ var(''dictionary_schema'', \'external\') }}"') %}
     {% do sources_yaml.append('    loader:  Manual') %}

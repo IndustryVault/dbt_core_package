@@ -27,7 +27,7 @@
 	Select * From snowflake_account_usage.task_history where database={{ var('dictionary_database') | upper }} LIMIT 10;
    */
    use database {{ var('dictionary_database') }};
-   set schedule = '{{ var('dictionary_load_start') }}'
+   set schedule = '{{ var('dictionary_load_start') }}';
    {%- endset -%}
 
    {% do temp.append(header | string ) %}

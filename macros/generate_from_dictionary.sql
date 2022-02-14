@@ -31,7 +31,7 @@
    {%- endset -%}
 
    {% do temp.append(header | string ) %}
-   {% if include_tasks = 'true' %}
+   {% if include_tasks == 'true' %}
    {% set task_template %}
 	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
 		ALLOW_OVERLAPPING_EXECUTION=FALSE

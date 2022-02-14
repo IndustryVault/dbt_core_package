@@ -57,6 +57,7 @@
     {% set task_template %}
         alter external table external.{@source_table_name} refresh;
 
+	truncate table portfolio.{@stage_table_name};
 	insert into portfolio.{@stage_table_name}
 	Select * from portfolio.vw_{@stage_table_name}
 	where cycle_date IN 

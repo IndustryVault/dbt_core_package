@@ -319,7 +319,7 @@
 
 {% endmacro %}
 ---
-{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, schema_name='external', filter='') %}
+{% macro generate_source_from_dictionary(generate_columns=True, include_descriptions=True, include_external=False, source_identifier=True, schema_name='external', filter='') %}
 
     {% set sources_yaml=[] %}
 
@@ -346,11 +346,12 @@
     {% set tables = run_query(query) %}
 
     {% for tbl in tables %}
-    	{% if schema_name=='external' %}
+    	{% if source_identifer %}
 		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__'  ~ tbl.SOURCE_TABLE_NAME | lower) %}
 		{% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}	
 	{% else %}
  		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower) %}
+		{% do sources_yaml.append('        identifier: ' ~ tbl.STAGE_TABLE_NAME ) %}	
 	{% endif %}
         {% if include_external %}
             {% do sources_yaml.append('        external: ' ) %}
@@ -381,7 +382,7 @@
 
             {% set columns=run_query(query) %}
             {% for column in columns %}
-		{% if schema_name=='external' %}
+		{% if source_identifier %}
 			{% set column_name_name = column.SOURCE_COLUMN_NAME %}
 		{% else %}
 			{% set column_name = column.STAGE_COLUMN_NAME %}

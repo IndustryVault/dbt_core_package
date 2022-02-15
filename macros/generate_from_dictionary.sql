@@ -67,7 +67,7 @@
 	truncate table portfolio.{@stage_table_name};
 	insert into portfolio.{@stage_table_name}
 	Select * from portfolio.vw_{@stage_table_name}
---	where cycle_date IN 
+--	where as_of_date IN 
 --	(
 --		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
 --		except

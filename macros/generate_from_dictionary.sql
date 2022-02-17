@@ -320,7 +320,7 @@
 
 {% endmacro %}
 ---
-{% macro generate_source_from_dictionary(generate_columns=True, include_cycle_date: True, include_descriptions=True, include_external=False, source_identifier=True, schema_name='external', filter='') %}
+{% macro generate_source_from_dictionary(generate_columns=True, include_cycle_date=True, include_descriptions=True, include_external=False, source_identifier=True, schema_name='external', filter='') %}
 
     {% set sources_yaml=[] %}
 

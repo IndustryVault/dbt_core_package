@@ -79,7 +79,12 @@
        {% else %}
     {% set task_template %}
     
-    	drop task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load;
+	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
+	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load suspend;
+
+
+   	drop task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh;
+   	drop task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load;
 	
         alter external table external.{@source_table_name} refresh;
 
@@ -103,7 +108,6 @@
 --		Select distinct as_of_date from portfolio.{@stage_table_name}
 --	)
 ;
-       
     {% endset %}      
       {% endif %}
 

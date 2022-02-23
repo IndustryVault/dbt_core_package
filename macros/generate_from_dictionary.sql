@@ -40,8 +40,23 @@
 		schedule=$schedule
     AS 
         alter external table external.{@source_table_name} refresh;
+
 		
-   alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load suspend;
+   alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load suspend;
+   create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load
+		WAREHOUSE=INGESTION_WH
+		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
+   AS
+	insert into portfolio.{@stage_table_name}
+	Select * from portfolio.vw_{@stage_table_name}
+	where as_of_date IN 
+	(
+		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
+		except
+		Select distinct as_of_date from portfolio.{@stage_table_name}
+	);
+	
+   alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load suspend;
    create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load
 		WAREHOUSE=INGESTION_WH
 		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
@@ -55,15 +70,29 @@
 		Select distinct as_of_date from portfolio.{@stage_table_name}
 	);
 
-  alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load resume;
+  alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load resume;
+  alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load resume;
   alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh resume;
 
 		
     {% endset %}
        {% else %}
     {% set task_template %}
+    
+    	drop task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load;
+	
         alter external table external.{@source_table_name} refresh;
 
+	truncate table historical.{@stage_table_name};
+	insert into historical.{@stage_table_name}
+	Select * from historical.vw_{@stage_table_name}
+--	where as_of_date IN 
+--	(
+--		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
+--		except
+--		Select distinct as_of_date from portfolio.{@stage_table_name}
+--	)
+;	
 	truncate table portfolio.{@stage_table_name};
 	insert into portfolio.{@stage_table_name}
 	Select * from portfolio.vw_{@stage_table_name}

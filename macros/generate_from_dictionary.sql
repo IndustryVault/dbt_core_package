@@ -372,8 +372,8 @@
     {% do sources_yaml.append('sources:') %}
     {% do sources_yaml.append('  - name: ' ~ database_name | lower ) %}
     {% do sources_yaml.append('    description: "' ~ var('dictionary_source_description') ~ '"') %}
-    {% do sources_yaml.append('    database: "{{ database_name }}"') %}
-    {% do sources_yaml.append('    schema:  "{{ schema_name }}"') %}
+    {% do sources_yaml.append('    database: "' ~  database_name ~ '"') %}
+    {% do sources_yaml.append('    schema:  "' ~ schema_name  ~ '"') %}
     {% do sources_yaml.append('    loader:  Manual') %}
 
     {% do sources_yaml.append('    tables:') %}

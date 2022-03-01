@@ -353,15 +353,24 @@
 
 {% endmacro %}
 ---
-{% macro generate_source_from_dictionary(generate_columns=True, include_cycle_date=True, include_descriptions=True, include_external=False, source_identifier=True, schema_name='external', filter='') %}
+{% macro generate_source_from_dictionary(database_name='default', version_name='default', schema_name='external', generate_columns=True, include_cycle_date=True, include_descriptions=True, include_external=False, source_identifier=True, filter='') %}
 
     {% set sources_yaml=[] %}
 
+	{% if database_name='default' %}
+        {% set database_name = {{var('dictionary_database', target.database)}} %}
+    {% endif %}
+    {% if version_name='default' %}
+        {% set version_name = {{var('version_name', target.database)}} %}
+    {% endif %}
+    {% if schema_name='default' %}
+        {% set version_name = {{var('dictionary_schema', 'external')}} %}
+    {% endif %}
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('version: 2') %}
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('sources:') %}
-    {% do sources_yaml.append('  - name: ' ~ var('dictionary_database') | lower ) %}
+    {% do sources_yaml.append('  - name: ' ~ database_name | lower ) %}
     {% do sources_yaml.append('    description: "' ~ var('dictionary_source_description') ~ '"') %}
     {% do sources_yaml.append('    database: "{{ var(''dictionary_database'', target.database) }}"') %}
     {% do sources_yaml.append('    schema:  "{{ var(''dictionary_schema'', \'external\') }}"') %}
@@ -373,7 +382,7 @@
     	select DISTINCT source_table_name, stage_table_name 
 	from internal.dictionary 
 	where 
-		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+		database_name='{{ database_name }}' and version_name='{{ version_name }}' 
 		{{ filter }}
 	order by stage_table_name
     {% endset %}

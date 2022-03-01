@@ -361,7 +361,7 @@
         {% set database_name = var('dictionary_database', target.database) %}
     {% endif %}
     {% if version_name=='default' %}
-        {% set version_name = var('version_name', target.database) %}
+        {% set version_name = var('dictionary_database_version', 'default') %}
     {% endif %}
     {% if schema_name=='default' %}
         {% set version_name = var('dictionary_schema', 'external') %}

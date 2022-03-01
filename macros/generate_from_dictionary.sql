@@ -386,8 +386,6 @@
 		{{ filter }}
 	order by stage_table_name
     {% endset %}
-          {% do temp.append(task_template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
-
     {% set tables = run_query(query | string | replace('{@database_name}', database_name) | replace('{@version_name}', version_name) ) %}
 
     {% for tbl in tables %}

@@ -387,7 +387,6 @@
 	order by stage_table_name
     {% endset %}
     {% set tables = run_query(query | string | replace('{@database_name}', database_name) | replace('{@version_name}', version_name) ) %}
-    {% do sources_yaml.append(query | string | replace('{@database_name}', database_name) | replace('{@version_name}', version_name)) %}
 
     {% for tbl in tables %}
     	{% if source_identifer %}

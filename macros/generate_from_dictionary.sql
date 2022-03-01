@@ -357,13 +357,13 @@
 
     {% set sources_yaml=[] %}
 
-	{% if database_name='default' %}
+    {% if database_name=='default' %}
         {% set database_name = {{var('dictionary_database', target.database)}} %}
     {% endif %}
-    {% if version_name='default' %}
+    {% if version_name=='default' %}
         {% set version_name = {{var('version_name', target.database)}} %}
     {% endif %}
-    {% if schema_name='default' %}
+    {% if schema_name=='default' %}
         {% set version_name = {{var('dictionary_schema', 'external')}} %}
     {% endif %}
     {% do sources_yaml.append('') %}

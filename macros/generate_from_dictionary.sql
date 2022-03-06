@@ -49,7 +49,7 @@
         delete from table historical.{@stage_table_name}  
         where cycle_date in (
             Select to_date(split_part(file_name,'/',3)) as cycle_date 
-            from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}'))
+            from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@source_table_name}'))
             where last_modified > dateadd(day, -1, CURRENT_DATE)
         );
     
@@ -62,7 +62,7 @@
     where cycle_date IN 
     (
         Select to_date(split_part(file_name,'/',3)) as cycle_date 
-        from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}'))
+        from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@source_table_name}'))
         where last_modified > dateadd(day, -1, CURRENT_DATE)
     );
 	
@@ -73,7 +73,7 @@
         delete from table portfolio.{@stage_table_name}  
         where as_of_date >= (
             Select MIN( to_date(split_part(file_name,'/',3)) ) as cycle_date 
-            from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}') )
+            from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@source_table_name}') )
             where last_modified > dateadd(day, -1, CURRENT_DATE)
        );
 		
@@ -86,7 +86,7 @@
         where as_of_date >= 
         (
             Select MIN( to_date(split_part(file_name,'/',3)) ) as cycle_date 
-            from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}') )
+            from table(information_schema.EXTERNAL_TABLE_FILES(table_name => '{{ var('dictionary_database') }}.external.{@source_table_name}') )
             where last_modified > dateadd(day, -1, CURRENT_DATE)
         );
 

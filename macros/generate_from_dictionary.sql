@@ -33,81 +33,87 @@
    {% do temp.append(header | string ) %}
    {% if include_tasks == 'true' %}
    {% set task_template %}
-   	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
-	create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
-		ALLOW_OVERLAPPING_EXECUTION=FALSE
-		WAREHOUSE=INGESTION_WH
-		schedule=$schedule
+
+    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
+    create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
+        ALLOW_OVERLAPPING_EXECUTION=FALSE
+        WAREHOUSE=INGESTION_WH
+        schedule=$schedule
     AS 
         alter external table external.{@source_table_name} refresh;
 
-		
-   alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load suspend;
-   create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load
-		WAREHOUSE=INGESTION_WH
+    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete suspend;
+    create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
 		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
+        WAREHOUSE=INGESTION_WH
+    AS 
+        delete from table historical.{@stage_table_name}  
+        where cycle_date in (
+            Select to_date(split_part(file_name,'/',3)) as cycle_date 
+            from table(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}')
+            where last_modified > dateadd(day, -1, CURRENT_DATE)
+        );
+    
+   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load suspend;
+   create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load
+		WAREHOUSE=INGESTION_WH
+		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
    AS
-	insert into portfolio.{@stage_table_name}
-	Select * from portfolio.vw_{@stage_table_name}
-	where as_of_date IN 
-	(
-		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
-		except
-		Select distinct as_of_date from portfolio.{@stage_table_name}
-	);
+    insert into historical.{@stage_table_name}
+    Select * from historical.vw_{@stage_table_name}
+    where cycle_date IN 
+    (
+        Select to_date(split_part(file_name,'/',3)) as cycle_date 
+        from table(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}')
+        where last_modified > dateadd(day, -1, CURRENT_DATE)
+    );
 	
-   alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load suspend;
-   create or replace task {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load
-		WAREHOUSE=INGESTION_WH
-		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
-   AS
-	insert into portfolio.{@stage_table_name}
-	Select * from portfolio.vw_{@stage_table_name}
-	where as_of_date IN 
-	(
-		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
-		except
-		Select distinct as_of_date from portfolio.{@stage_table_name}
-	);
-
-  alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load resume;
-  alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load resume;
-  alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh resume;
-
+    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete suspend;
+    create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
+ 	   AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
+       WAREHOUSE=INGESTION_WH
+    AS 
+        delete from table portfolio.{@stage_table_name}  
+        where as_of_date >= (
+            Select MIN( to_date(split_part(file_name,'/',3)) ) as cycle_date 
+            from table(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}') 
+            where last_modified > dateadd(day, -1, CURRENT_DATE)
+       );
 		
+   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load suspend;
+   create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load
+		WAREHOUSE=INGESTION_WH
+		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
+   AS
+        insert into portfolio.{@stage_table_name}
+        Select * from portfolio.vw_{@stage_table_name}
+        where as_of_date >= 
+        (
+            Select MIN( to_date(split_part(file_name,'/',3)) ) as cycle_date 
+            from table(table_name => '{{ var('dictionary_database') }}.external.{@stage_table_name}') 
+            where last_modified > dateadd(day, -1, CURRENT_DATE)
+        );
+
+  alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load resume;
+  alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete resume;
+  alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load resume;
+  alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete resume;
+  alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh resume;
+	
     {% endset %}
        {% else %}
     {% set task_template %}
-    
-	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
-	alter task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load suspend;
 
-
-   	drop task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh;
-   	drop task if exists {{ var('dictionary_database') }}_external_{@stage_table_name}_incremental_load;
-	
-        alter external table external.{@source_table_name} refresh;
+    alter external table external.{@source_table_name} refresh;
 
 	truncate table historical.{@stage_table_name};
 	insert into historical.{@stage_table_name}
-	Select * from historical.vw_{@stage_table_name}
---	where as_of_date IN 
---	(
---		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
---		except
---		Select distinct as_of_date from portfolio.{@stage_table_name}
---	)
-;	
+	Select * from historical.vw_{@stage_table_name};
+    
 	truncate table portfolio.{@stage_table_name};
 	insert into portfolio.{@stage_table_name}
-	Select * from portfolio.vw_{@stage_table_name}
---	where as_of_date IN 
---	(
---		Select distinct as_of_date from portfolio.vw_{@stage_table_name}
---		except
---		Select distinct as_of_date from portfolio.{@stage_table_name}
---	)
-;
+	Select * from portfolio.vw_{@stage_table_name};
+    
     {% endset %}      
       {% endif %}
 

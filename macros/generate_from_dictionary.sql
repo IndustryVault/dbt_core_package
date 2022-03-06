@@ -44,8 +44,7 @@
 
     alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete suspend;
     create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
-		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
-        WAREHOUSE=INGESTION_WH
+	    AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
     AS 
         delete from table historical.{@stage_table_name}  
         where cycle_date in (
@@ -56,8 +55,7 @@
     
    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load suspend;
    create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load
-		WAREHOUSE=INGESTION_WH
-		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
+        AFTER {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
    AS
     insert into historical.{@stage_table_name}
     Select * from historical.vw_{@stage_table_name}
@@ -70,8 +68,7 @@
 	
     alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete suspend;
     create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
- 	   AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
-       WAREHOUSE=INGESTION_WH
+ 	   AFTER {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
     AS 
         delete from table portfolio.{@stage_table_name}  
         where as_of_date >= (
@@ -82,8 +79,7 @@
 		
    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load suspend;
    create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load
-		WAREHOUSE=INGESTION_WH
-		AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
+		AFTER {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
    AS
         insert into portfolio.{@stage_table_name}
         Select * from portfolio.vw_{@stage_table_name}

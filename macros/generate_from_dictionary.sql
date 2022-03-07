@@ -46,8 +46,26 @@
     create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
        AFTER {{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
     AS 
-    	call external.task__delete_by_cycle_date('historical', '{{@stage_table_name}');
- 
+    	call external.task__delete_by_cycle_date('historical', '{@stage_table_name}');
+    
+   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load suspend;
+   create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load
+      AFTER {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete
+   AS
+   	call external.task__insert_by_cycle_date('historical','{@stage_table_name}');
+	
+    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete suspend;
+    create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
+       AFTER task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load
+    AS 
+    	call external.task__delete_by_as_of_date('portfolio', '{@stage_table_name}');
+
+   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load suspend;
+   create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load
+        AFTER {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
+   AS
+   	call external.task__insert_by_as_of_date('portfolio','{@stage_table_name}');
+
   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load resume;
   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete resume;
   alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load resume;

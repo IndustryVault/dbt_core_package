@@ -54,7 +54,7 @@
     AS
         call external.task__insert_by_cycle_date('historical','{@stage_table_name}', '{@source_table_name}');
 
-    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete suspend;
+    alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete suspend;
     create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete
        AFTER {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load
     AS 

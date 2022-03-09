@@ -77,9 +77,9 @@
 
     execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh;
     execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete;
-    execute task  {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load resume;
-    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete resume;
-    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load resume;
+    execute task  {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load;
+    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete;
+    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load;
   
     {% endset %}      
      {% set task_template2 %}

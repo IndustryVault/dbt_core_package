@@ -75,13 +75,22 @@
        {% else %}
     {% set task_template %}
 
+    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh;
+    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_delete;
+    execute task  {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_historical_load resume;
+    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_delete resume;
+    execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_portfolio_load resume;
+  
+    {% endset %}      
+     {% set task_template2 %}
+
     alter external table external.{@source_table_name} refresh;
     call external.task__delete_by_cycle_date('historical', '{@stage_table_name}', '{@source_table_name}');
     call external.task__insert_by_cycle_date('historical','{@stage_table_name}', '{@source_table_name}');
     call external.task__delete_by_as_of_date('portfolio', '{@stage_table_name}', '{@source_table_name}');
     call external.task__insert_by_as_of_date('portfolio','{@stage_table_name}', '{@source_table_name}');
-    {% endset %}      
-      {% endif %}
+    {% endset %}  
+    {% endif %}
 
     {%- set query -%}
 	select  

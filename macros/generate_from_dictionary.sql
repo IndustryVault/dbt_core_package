@@ -8,7 +8,7 @@
 # the portfolio schema. Should generate the good performance for public usage as well as allowing
 # for easy change.
 
-{% macro generate_incremental_load_tasks_from_dictionary(include_tasks='true') %}
+{% macro generate_incremental_load_tasks_from_dictionary(include_tasks='true', use_standard_warehouse='true') %}
    {% set temp=[] %}
    
    {% set header %}
@@ -75,7 +75,6 @@
     {% endset %}
        {% else %}
     {% set task_template2 %}
-
     execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh;
     {% endset %}      
      {% set task_template %}
@@ -99,7 +98,11 @@
 	order by stage_table_name
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
-   
+   {% if use_standard_warehouse == 'true' %}
+   	{% set warehouse = 'INGESTION_WH' %}
+   {% else %}
+   	{% set warehouse = '{{ var('dictionary_database') }}' + '_INGESTION_WH' %}
+   {% endif %}
    {% for tbl in tables %}
       {% do temp.append(task_template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
    {% endfor %}

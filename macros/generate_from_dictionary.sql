@@ -27,6 +27,7 @@
 	Select * From snowflake_account_usage.task_history where database={{ var('dictionary_database') | upper }} LIMIT 10;
    */
    use database {{ var('dictionary_database') }};
+   use schema external;
    set schedule = '{{ var('dictionary_load_start') }}';
    {%- endset -%}
 
@@ -37,7 +38,7 @@
     alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
     create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
         ALLOW_OVERLAPPING_EXECUTION=FALSE
-        WAREHOUSE=INGESTION_WH
+        WAREHOUSE={{ var('dictionary_database') }}_INGESTION_WH
 	schedule=$schedule
     AS 
         alter external table external.{@source_table_name} refresh;

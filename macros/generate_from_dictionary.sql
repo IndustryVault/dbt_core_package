@@ -101,7 +101,7 @@
    {% if use_standard_warehouse == 'true' %}
    	{% set warehouse = 'INGESTION_WH' %}
    {% else %}
-   	{% set warehouse = '{{ var('dictionary_database') }}' + '_INGESTION_WH' %}
+   	{% set warehouse = '{{ var('dictionary_database') }}_INGESTION_WH' %}
    {% endif %}
    {% for tbl in tables %}
       {% do temp.append(task_template | string | replace('{@warehouse}', warehouse) | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}

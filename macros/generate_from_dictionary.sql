@@ -38,7 +38,7 @@
     alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh suspend;
     create or replace task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh
         ALLOW_OVERLAPPING_EXECUTION=FALSE
-        WAREHOUSE={{ var('dictionary_database') }}_INGESTION_WH
+        WAREHOUSE={@warehouse}
 	schedule=$schedule
     AS 
         alter external table external.{@source_table_name} refresh;
@@ -104,7 +104,7 @@
    	{% set warehouse = '{{ var('dictionary_database') }}' + '_INGESTION_WH' %}
    {% endif %}
    {% for tbl in tables %}
-      {% do temp.append(task_template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
+      {% do temp.append(task_template | string | replace('{@warehouse}', warehouse) | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME) | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

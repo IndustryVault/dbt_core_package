@@ -74,10 +74,10 @@
     alter task if exists {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh resume;
     {% endset %}
        {% else %}
-    {% set task_template %}
+    {% set task_template_old %}
     execute task {{ var('dictionary_database') }}.external.{{ var('dictionary_database') }}_external_{@stage_table_name}_refresh;
     {% endset %}      
-     {% set task_template_old %}
+     {% set task_template %}
 
     alter external table external.{@source_table_name} refresh;
     call external.task__delete_by_cycle_date('historical', '{@stage_table_name}', '{@source_table_name}');

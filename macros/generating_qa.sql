@@ -1,5 +1,5 @@
 
-{% macro generate_all_tables_current(schema_name) %}
+{% macro check_all_tables_current(schema_name) %}
    {% set temp=[] %}
    
    {% set header %}
@@ -17,13 +17,13 @@
    {% endset %}
    
    {%- set query -%}
-      select  table_name from information_schema.tables where lower(table_schema)='{@schema_name}'
+      select  table_schema, table_name from internal.dictionary where lower(table_schema)='{@schema_name}'
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
      {%- if not loop.first %} UNION ALL {% endif %}
-      {% do temp.append(template | string | replace('{@table_name}', tbl.TABLE_NAME)| replace('{@schema_name}', schema_name) ) %}
+      {% do temp.append(template | string | replace('{@table_name}', tbl.TABLE_NAME)| replace('{@schema_name}', tbl.SCHEMA_NAME) ) %}
    {% endfor %}
 
    {% do temp.append(footer | string ) %}

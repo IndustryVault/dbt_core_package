@@ -18,7 +18,7 @@
    
     {%- set query -%}
 	select  
-		DISTINCT stage_table_name
+		DISTINCT stage_table_name as table_name
 	from internal.dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 

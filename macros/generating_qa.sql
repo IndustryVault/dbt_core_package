@@ -23,7 +23,7 @@
    
    {% for tbl in tables %}
      {%- if not loop.first %} UNION ALL {% endif %}
-      {% do temp.append(template | string | replace('{@table_name}', tbl.TABLE_NAME)| replace('{@schema_name}', schema_name) %}
+      {% do temp.append(template | string | replace('{@table_name}', tbl.TABLE_NAME)| replace('{@schema_name}', schema_name) ) %}
    {% endfor %}
 
    {% do temp.append(footer | string ) %}

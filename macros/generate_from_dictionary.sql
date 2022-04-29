@@ -371,7 +371,7 @@
     {% for tbl in tables %}
     	{% if source_identifier %}
 		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__'  ~ tbl.SOURCE_TABLE_NAME | lower) %}
-		{% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}	
+		{% do sources_yaml.append('        identifier: "' ~ tbl.SOURCE_TABLE_NAME ~ '"') %}	
 	{% else %}
  		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower) %}
 		{% do sources_yaml.append('        identifier: ' ~ tbl.STAGE_TABLE_NAME ) %}	

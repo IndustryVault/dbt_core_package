@@ -409,7 +409,7 @@
             {% set columns=run_query(query) %}
             {% for column in columns %}
 		{% if source_identifier %}
-			{% set column_name_name = column.SOURCE_COLUMN_NAME %}
+			{% set column_name = column.SOURCE_COLUMN_NAME %}
 		{% else %}
 			{% set column_name = column.STAGE_COLUMN_NAME %}
 		{% endif %}

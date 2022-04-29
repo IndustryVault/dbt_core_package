@@ -413,7 +413,7 @@
 		{% else %}
 			{% set column_name = column.STAGE_COLUMN_NAME %}
 		{% endif %}
-		{% do sources_yaml.append('          - name: ' ~ column_name ) %}
+		{% do sources_yaml.append('          - name: "' ~ column_name ~ '"') %}
                 {% do sources_yaml.append('            data_type: ' ~ column.STAGE_COLUMN_TYPE ) %}
                 {% if include_descriptions %}
                     {% do sources_yaml.append('            description: "' ~ column.STAGE_COLUMN_DESCRIPTION + '"' ) %}

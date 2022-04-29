@@ -369,7 +369,7 @@
     {% set tables = run_query(query | string | replace('{@database_name}', database_name) | replace('{@version_name}', version_name) ) %}
 
     {% for tbl in tables %}
-    	{% if source_identifer %}
+    	{% if source_identifier %}
 		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__'  ~ tbl.SOURCE_TABLE_NAME | lower) %}
 		{% do sources_yaml.append('        identifier: ' ~ tbl.SOURCE_TABLE_NAME ) %}	
 	{% else %}

@@ -8,7 +8,137 @@
 # the portfolio schema. Should generate the good performance for public usage as well as allowing
 # for easy change.
 
-{% macro generate_incremental_load_tasks_from_dictionary(include_tasks='true', use_standard_warehouse='true') %}
+{% macro generate_from_dictionary_create_tables(dictionary_name='dictionary', target_schema='input') %}
+   {% set temp=[] %}
+   {% set header %}
+   use database {{ target.database }};
+   {%- endset -%}
+   {% do temp.append(header | string ) %}
+
+   {% set task_template %}
+CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table_name} 
+(
+    {@column_list_with_type}
+);
+    {% endset %}
+
+    {%- set query -%}
+  	select  
+		DISTINCT stage_table_name, source_table_name
+         , listagg(CONCAT('"',source_column_name,'" ',source_column_type,'\n'), ',') within group ( order by column_order) as column_list, import_file
+	from internal.{{dictionary_name}}
+	where 
+		database_name='{{var('dictionary_database', target.database)}}' and version_name='{{var('dictionary_database_version')}}' 
+	group by stage_table_name, source_table_name, import_file
+	order by stage_table_name
+   {%- endset -%}
+   {%- set tables = run_query(query)  -%}   
+   
+   {% for tbl in tables %}
+      {% do temp.append(task_template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@column_list_with_type}', tbl.COLUMN_LIST)) %}
+   {% endfor %}
+
+   {% set results = temp | join ('\n') %}
+   {{ log(results, info=True) }}
+   {% do return(results) %}
+{% endmacro %}
+--
+{% macro generate_from_dictionary_load_tables(dictionary_name='dictionary', target_schema='input') %}
+   {% set temp=[] %}
+
+   {% set header %}
+   use database {{ target.database }};
+   use schema {{ target_schema }};
+   CREATE FILE FORMAT IF NOT EXISTS {{ target.database }}.{{ target_schema }}.fayfin_csv_format
+   TYPE = 'CSV'
+   field_delimiter = '|'
+   skip_header = 1
+   TRIM_SPACE = TRUE
+   ESCAPE_UNENCLOSED_FIELD = NONE 
+   NULL_IF='NA'
+   record_delimiter='\r\n'
+   ;
+   {%- endset -%}
+   {% do temp.append(header | string ) %}
+
+  {% set template %}
+   alter task if exists {{ target.database }}_{@source_table_name}_truncate suspend;
+	create or replace task {{ target.database }}_{@source_table_name}_truncate
+		ALLOW_OVERLAPPING_EXECUTION=FALSE
+		WAREHOUSE=INGESTION_WH
+		schedule='{{ var('load_start') }}'
+    AS 
+      truncate table {{ target.database }}.{{ target_schema }}.{@source_table_name};
+
+   alter task if exists {{ target.database }}_{@source_table_name}_reload suspend;
+   create or replace task {{ target.database }}_{@source_table_name}_reload
+		WAREHOUSE=INGESTION_WH
+		AFTER {{ target.database }}_{@source_table_name}_truncate
+   AS
+      COPY INTO {{ target.database }}.{{ target_schema }}.{@source_table_name} from @bde.raw.data_lake_stage_toplevel/generic-lake/{@lower_import_file}
+      file_format = (format_name= {{ target.database }}.{{ target_schema }}.fayfin_csv_format, encoding='{@encoding}');
+
+  alter task if exists {{ target.database }}_{@source_table_name}_reload resume;
+  alter task if exists {{ target.database }}_{@source_table_name}_truncate resume;
+    {% endset %}
+
+    {%- set query -%}
+  	select  
+		DISTINCT source_table_name
+         , 'utf-16'  as encoding
+         , listagg(CONCAT(stage_column_name,' ',stage_column_type,'\n'), ',') within group ( order by column_order) as column_list, import_file
+	from internal.{{dictionary_name}}
+	where 
+		database_name='{{var('dictionary_database', target.database)}}' and version_name='{{var('dictionary_database_version')}}' 
+	group by source_table_name, import_file
+	order by source_table_name
+   {%- endset -%}
+   {%- set tables = run_query(query) -%}   
+   
+   {% for tbl in tables %}
+      {% do temp.append(template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME)| replace('{@encoding}', tbl.ENCODING) | replace('{@column_list_with_type}', tbl.COLUMN_LIST)  | replace('{@lower_import_file}', tbl.IMPORT_FILE | lower) ) %}
+   {% endfor %}
+
+   {% set results = temp | join ('\n') %}
+   {{ log(results, info=True) }}
+   {% do return(results) %}
+{% endmacro %}
+--
+{% macro generate_from_dictionary_execute_tables(dictionary_name='dictionary', target_schema='input') %}
+   {% set temp=[] %}
+
+   {% set header %}
+   use database {{ target.database }};
+   use schema {{ target_schema }};
+   {%- endset -%}
+   {% do temp.append(header | string ) %}
+
+   {% set template %}
+      execute task {{ target.database }}_{@source_table_name}_truncate ;
+   {% endset %}
+
+    {%- set query -%}
+  	select  
+		DISTINCT stage_table_name, source_table_name
+         , 'utf-16'  as encoding
+	from internal.{{dictionary_name}}
+	where 
+		database_name='{{var('dictionary_database', target.database)}}' and version_name='{{var('dictionary_database_version')}}' 
+	group by stage_table_name, source_table_name, import_file
+	order by stage_table_name
+   {%- endset -%}
+   {%- set tables = run_query(query) -%}   
+   
+   {% for tbl in tables %}
+      {% do temp.append(template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME)) %}
+   {% endfor %}
+
+   {% set results = temp | join ('\n') %}
+   {{ log(results, info=True) }}
+   {% do return(results) %}
+{% endmacro %}
+--
+{% macro generate_from_dictionary_incremental_load_tasks(include_tasks='true', use_standard_warehouse='true') %}
    {% set temp=[] %}
    
    {% set header %}
@@ -143,12 +273,16 @@
     {% do return(results) %}
 {% endmacro %}
 ---
-{% macro generate_external_refresh_from_dictionary() %}
+{% macro generate_from_dicitonary_external_refresh() %}
 
     {% set sources_yaml=[] %}
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('use database ' ~ var('dictionary_database') ~';') %}
-    {% set tables=get_tables_from_dictionary() %}
+ 
+    {% set query %}
+    select DISTINCT source_table_name, stage_table_name from internal.dictionary where database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' order by stage_table_name
+    {% endset %}
+    {% set tables = run_query(query) %}
 
     {% for tbl in tables %}
 	    {% do sources_yaml.append('Alter external table external.{@table_name} REFRESH;' | replace('{@table_name}', tbl.SOURCE_TABLE_NAME) ) %}
@@ -164,7 +298,7 @@
 
 {% endmacro %}
 ---
-{% macro generate_external_from_dictionary(table_only='false') %}
+{% macro generate_from_dictionary_external_tables(table_only='false') %}
 
     {% set external_file_format = var('dictionary_external_format') %}
     {% set file_format_name = var('dictionary_file_format_name') %}
@@ -184,7 +318,13 @@
         {% endif %}
     {% endif %}
 
-    {% set tables=get_tables_from_dictionary() %}
+    {% set query %}
+    select DISTINCT source_table_name, stage_table_name from internal.dictionary 
+    	where database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+	order by stage_table_name
+    {% endset %}
+    {% set tables = run_query(query) %}
+
     {% for tbl in tables %}
         {% if table_only == 'false' %}
             {% do sources_yaml.append('CREATE OR REPLACE EXTERNAL TABLE external.' ~ tbl.SOURCE_TABLE_NAME) %}
@@ -251,89 +391,8 @@
     {% endif %}
 
 {% endmacro %}
---
-{% macro generate_raw_from_dictionary() %}
-
-    {% set sources_yaml=[] %}
-    {% do sources_yaml.append('') %}
-    {% set tables=get_tables_from_dictionary() %}
-
-    {% for tbl in tables %}
-        {% do sources_yaml.append('CREATE OR REPLACE TABLE raw.' ~ tbl.SOURCE_TALBE_NAME) %}
-        {% do sources_yaml.append('(') %}
-        {% do sources_yaml.append('     _uid bigint identity(1,1)') %}
-        {% do sources_yaml.append('     , cycle_datecycle_date date not null') %}
-
-        {% set query %}
-            select  
-                source_column_name, source_column_type, stage_column_name, lower(stage_column_type) stage_column_type  
-            from internal.dictionary 
-            where 
-                database_name='{{ var('dictionary_database') }}' 
-                and version_name='{{ var('dictionary_database_version') }}' 
-                and source_table_name='{{tbl.SOURCE_COLUMN_NAME}}' 
-            order by column_order
-        {% endset %}
-
-        {% set columns=run_query(query) %}
-        {% for column in columns %}
-            {% do sources_yaml.append('     , {@source_column_name} {@data_type} null' | replace('{@source_column_name}', column.SOURCE_TABLE_NAME) | replace('{@data_type}',column.STAGE_COLUMN_TYPE) ) %}
-        {% endfor %}
-
-        {% do sources_yaml.append(');') %}
-        {% do sources_yaml.append('') %}
-    {% endfor %}
-
-    {% if execute %}
-
-        {% set joined = sources_yaml | join ('\n') %}
-        {{ log(joined, info=True) }}
-        {% do return(joined) %}
-
-    {% endif %}
-
-{% endmacro %}
---
-{% macro get_latest_version_from_dictionary() %}
-
-    {% set query %}
-        select to_char(MAX(version_name)) latest_version_name from internal.dictionary where database_name='{{ var('dictionary_database') }}'
-    {% endset %}
-    {% set results = run_query(query) %}
-        {{ log('get_latest_version_from_dictionary - ' ~ results[0].LATEST_VERSION_NAME, info=True) }}
-    {{ return(results[0].LATEST_VERSION_NAME)}}
-
-{% endmacro %}
---
-{% macro get_tables_from_dictionary() %}
-
-    {% set query %}
-    select DISTINCT source_table_name, stage_table_name from internal.dictionary where database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' order by stage_table_name
-    {% endset %}
-    {% set table_list = run_query(query) %}
-
-    {{ return(table_list) }}
-
-{% endmacro %}
---
-{% macro get_source_table_from_dictionary(stage_table_name) %}
-
-    {% set query %}
-    select DISTINCT source_table_name, stage_table_name from internal.dictionary 
-        where stage_table_name='{{stage_table_name}}' and database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}'
-    {% endset %}
-    {% set results = run_query(query) %}
-    {{ log('get_source_table_from_dictionary - ' ~ results.SOURCE_TABLE_NAME, info=True) }}
-
-    {% if execute %}
-    {{ return(results.SOURCE_TABLE_NAME | string) }}
-{% else %}
-  {{ return('') }}
-{% endif %}
-
-{% endmacro %}
 ---
-{% macro generate_source_from_dictionary(database_name='default', version_name='default', schema_name='external', generate_columns=True, include_cycle_date=True, include_descriptions=True, include_external=False, source_identifier=True, filter='') %}
+{% macro generate_from_dictionary_source_yml(database_name='default', version_name='default', schema_name='external', generate_columns=True, include_cycle_date=True, include_descriptions=True, include_external=False, source_identifier=True, filter='') %}
 
     {% set sources_yaml=[] %}
 
@@ -432,7 +491,7 @@
 
 {% endmacro %}
 --
-{% macro generate_model_from_dictionary(schema_name, generate_columns=True, include_descriptions=True) %}
+{% macro generate_from_dictionary_model_yml(schema_name, generate_columns=True, include_descriptions=True) %}
 
     {% set sources_yaml=[] %}
 
@@ -441,7 +500,10 @@
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('models:') %}
 
-    {% set tables=get_tables_from_dictionary() %}
+    {% set query %}
+    select DISTINCT source_table_name, stage_table_name from internal.dictionary where database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' order by stage_table_name
+    {% endset %}
+    {% set tables = run_query(query) %}
 
     {% for tbl in tables %}
         {% do sources_yaml.append('      - name: ' ~ schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME ) %}

@@ -43,7 +43,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
    {% do return(results) %}
 {% endmacro %}
 --
-{% macro generate_from_dictionary_load_tables(dictionary_name='dictionary', target_schema='input') %}
+{% macro generate_from_dictionary_load_tables(dictionary_name='dictionary', target_schema='input', include_truncate='true') %}
    {% set temp=[] %}
 
    {% set header %}
@@ -61,26 +61,40 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
    {%- endset -%}
    {% do temp.append(header | string ) %}
 
-  {% set template %}
-   alter task if exists {{ target.database }}_{@source_table_name}_truncate suspend;
-	create or replace task {{ target.database }}_{@source_table_name}_truncate
-		ALLOW_OVERLAPPING_EXECUTION=FALSE
-		WAREHOUSE=INGESTION_WH
-		schedule='{{ var('load_start') }}'
-    AS 
-      truncate table {{ target.database }}.{{ target_schema }}.{@source_table_name};
+   {% if include_truncate == 'true' %}
+	  {% set template %}
+	   alter task if exists {{ target.database }}_{@source_table_name}_truncate suspend;
+		create or replace task {{ target.database }}_{@source_table_name}_truncate
+			ALLOW_OVERLAPPING_EXECUTION=FALSE
+			WAREHOUSE=INGESTION_WH
+			schedule='{{ var('load_start') }}'
+	    AS 
+	      truncate table {{ target.database }}.{{ target_schema }}.{@source_table_name};
 
-   alter task if exists {{ target.database }}_{@source_table_name}_reload suspend;
-   create or replace task {{ target.database }}_{@source_table_name}_reload
-		WAREHOUSE=INGESTION_WH
-		AFTER {{ target.database }}_{@source_table_name}_truncate
-   AS
-      COPY INTO {{ target.database }}.{{ target_schema }}.{@source_table_name} from @bde.raw.data_lake_stage_toplevel/generic-lake/{@lower_import_file}
-      file_format = (format_name= {{ target.database }}.{{ target_schema }}.fayfin_csv_format, encoding='{@encoding}');
+	   alter task if exists {{ target.database }}_{@source_table_name}_reload suspend;
+	   create or replace task {{ target.database }}_{@source_table_name}_reload
+			WAREHOUSE=INGESTION_WH
+			AFTER {{ target.database }}_{@source_table_name}_truncate
+	   AS
+	      COPY INTO {{ target.database }}.{{ target_schema }}.{@source_table_name} from @bde.raw.data_lake_stage_toplevel/generic-lake/{@lower_import_file}
+	      file_format = (format_name= {{ target.database }}.{{ target_schema }}.fayfin_csv_format, encoding='{@encoding}');
 
-  alter task if exists {{ target.database }}_{@source_table_name}_reload resume;
-  alter task if exists {{ target.database }}_{@source_table_name}_truncate resume;
-    {% endset %}
+	  alter task if exists {{ target.database }}_{@source_table_name}_reload resume;
+	  alter task if exists {{ target.database }}_{@source_table_name}_truncate resume;
+	    {% endset %}
+    {% else %}
+       {% set template %}
+	   alter task if exists {{ target.database }}_{@source_table_name}_reload suspend;
+	   create or replace task {{ target.database }}_{@source_table_name}_reload
+			WAREHOUSE=INGESTION_WH
+			schedule='{{ var('load_start') }}'
+	   AS
+	      COPY INTO {{ target.database }}.{{ target_schema }}.{@source_table_name} from @bde.raw.data_lake_stage_toplevel/generic-lake/{@lower_import_file}
+	      file_format = (format_name= {{ target.database }}.{{ target_schema }}.fayfin_csv_format, encoding='{@encoding}');
+
+	  alter task if exists {{ target.database }}_{@source_table_name}_reload resume;
+      {% endset %}
+  {% endif %}
 
     {%- set query -%}
   	select  

@@ -118,7 +118,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
    {% do return(results) %}
 {% endmacro %}
 --
-{% macro generate_from_dictionary_execute_tables(dictionary_name='dictionary', target_schema='input') %}
+{% macro generate_from_dictionary_execute_tables(dictionary_name='dictionary', target_schema='input', include_truncate='true') %}
    {% set temp=[] %}
 
    {% set header %}
@@ -127,9 +127,14 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
    {%- endset -%}
    {% do temp.append(header | string ) %}
 
+   {% if include_truncate == 'true' %}
    {% set template %}
       execute task {{ target.database }}_{@source_table_name}_truncate ;
    {% endset %}
+   {% else %}
+   {% set template %}
+      execute task {{ target.database }}_{@source_table_name}_reload ;
+   {% endset %}   {% endif %}
 
     {%- set query -%}
   	select  

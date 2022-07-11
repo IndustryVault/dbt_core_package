@@ -20,6 +20,6 @@ To use this set of macros you first must create a dictionary that meets the abov
 
 * `dbt run-operation generate_from_dictionary_external_tables` - build the script in the log output (no ability to write to a file in this macro language) that when executed will create the external tables that are the underpinning of this project. This has an optional argument that will instead generate normal tables. This was needed in working in an environment that did not have access to the raw JSON files
 * `dbt run-operation generate_from_dictionary_external_tables --args '{table_only: true}'` - build the script in the log output (no ability to write to a file in this macro language) that when executed will create the external tables that are the underpinning of this project. This has an optional argument that will instead generate normal tables. This was needed in working in an environment that did not have access to the raw JSON files
-* `dbt run-operation generate_from_dicitonary_external_refresh` - builds the refresh script to update the data in the external tables
+* `dbt run-operation generate_from_dictionary_external_refresh` - builds the refresh script to update the data in the external tables
 * `dbt run-operation generate_from_dictionary_source_yml` - builds the sources yml file (again, in the log output) that is copied and pasted into bde_src.yml
 * `dbt run-operation generate_from_dictionary_model_yml` - builds the model yml file in the log output that is copied and paster into bde_portfolio.yml

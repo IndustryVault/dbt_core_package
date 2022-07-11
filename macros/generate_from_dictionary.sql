@@ -292,7 +292,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
     {% do return(results) %}
 {% endmacro %}
 ---
-{% macro generate_from_dicitonary_external_refresh() %}
+{% macro generate_from_dictionary_external_refresh() %}
 
     {% set sources_yaml=[] %}
     {% do sources_yaml.append('') %}
@@ -520,7 +520,10 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
     {% do sources_yaml.append('models:') %}
 
     {% set query %}
-    select DISTINCT source_table_name, stage_table_name from internal.dictionary where database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' order by stage_table_name
+    select DISTINCT source_table_name, stage_table_name 
+    from internal.dictionary 
+    where database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+    order by stage_table_name
     {% endset %}
     {% set tables = run_query(query) %}
 

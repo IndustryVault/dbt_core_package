@@ -428,7 +428,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
     {% do sources_yaml.append('version: 2') %}
     {% do sources_yaml.append('') %}
     {% do sources_yaml.append('sources:') %}
-    {% do sources_yaml.append('  - name: ' ~ database_name | lower ) %}
+    {% do sources_yaml.append('  - name: ' ~ database_name | lower ~ '__' ~ schema_name ) %}
     {% do sources_yaml.append('    description: "' ~ var('dictionary_source_description') ~ '"') %}
     {% do sources_yaml.append('    database: "' ~  database_name ~ '"') %}
     {% do sources_yaml.append('    schema:  "' ~ schema_name  ~ '"') %}
@@ -448,11 +448,9 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
 
     {% for tbl in tables %}
     	{% if source_identifier %}
-		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__'  ~ tbl.SOURCE_TABLE_NAME | lower) %}
-		{% do sources_yaml.append('        identifier: "' ~ tbl.SOURCE_TABLE_NAME ~ '"') %}	
+		{% do sources_yaml.append('      - name: ""' ~  tbl.SOURCE_TABLE_NAME | lower ~ '"') %}
 	{% else %}
  		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower) %}
-		{% do sources_yaml.append('        identifier: ' ~ tbl.STAGE_TABLE_NAME ) %}	
 	{% endif %}
         {% if include_external %}
             {% do sources_yaml.append('        external: ' ) %}

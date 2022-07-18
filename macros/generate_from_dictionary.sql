@@ -450,7 +450,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
     	{% if source_identifier %}
 		{% do sources_yaml.append('      - name: ""' ~  tbl.SOURCE_TABLE_NAME | lower ~ '"') %}
 	{% else %}
- 		{% do sources_yaml.append('      - name: ' ~  schema_name ~ '__' ~ tbl.STAGE_TABLE_NAME | lower) %}
+ 		{% do sources_yaml.append('      - name: ' ~ tbl.STAGE_TABLE_NAME | lower) %}
 	{% endif %}
         {% if include_external %}
             {% do sources_yaml.append('        external: ' ) %}

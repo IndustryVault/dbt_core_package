@@ -382,7 +382,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
                 {% elif column.STAGE_COLUMN_TYPE == 'datetime' %}
                     {% do sources_yaml.append('	, {@source_column_name} {@data_type} as to_timestamp(value:"{@column_label}"::varchar(100), \'{@date_format}\')' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.DATE_FORMAT ) )%}
                 {% elif column.STAGE_COLUMN_TYPE.startswith('binary') %}
-                    {% do sources_yaml.append('	, {@source_column_name} {@data_type} as base64_decode_binary(value:"{@column_label}")' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.DATE_FORMAT ) )%}
+                    {% do sources_yaml.append('	, {@source_column_name} {@data_type} as base64_decode_binary(value:"{@column_label}")::{@data_type}' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}', column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE)  | replace('{@date_format}',  column.DATE_FORMAT ) )%}
                  {% else %}
                     {% do sources_yaml.append('	, {@source_column_name} {@data_type} as (value:"{@column_label}"::{@data_type})' | replace('{@source_column_name}', column.SOURCE_COLUMN_NAME) | replace('{@column_label}',  column_label) | replace('{@data_type}',column.STAGE_COLUMN_TYPE) ) %}
                 {% endif %}

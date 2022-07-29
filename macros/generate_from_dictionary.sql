@@ -87,7 +87,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
 	   alter task if exists {{ target.database }}_{@source_table_name}_reload suspend;
 	   create or replace task {{ target.database }}_{@source_table_name}_reload
 			WAREHOUSE=INGESTION_WH
-			schedule='{{ var('load_start') }}'
+			schedule='{{ var('dictionary_load_start') }}'
 	   AS
 	      COPY INTO {{ target.database }}.{{ target_schema }}.{@source_table_name} from @bde.raw.data_lake_stage_toplevel/generic-lake/{@lower_import_file}
 	      file_format = (format_name= {{ target.database }}.{{ target_schema }}.fayfin_csv_format, encoding='{@encoding}');

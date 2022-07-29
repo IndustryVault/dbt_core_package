@@ -96,6 +96,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
       {% endset %}
   {% endif %}
 
+   {% if include_import_file == 'true' %}
     {%- set query -%}
   	select  
 		DISTINCT source_table_name
@@ -107,6 +108,20 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
 	group by source_table_name, import_file
 	order by source_table_name
    {%- endset -%}
+   {% else %}
+     {%- set query -%}
+        select  
+		DISTINCT source_table_name
+         , 'utf-16'  as encoding
+         , listagg(CONCAT(stage_column_name,' ',stage_column_type,'\n'), ',') within group ( order by column_order) as column_list
+	from internal.{{dictionary_name}}
+	where 
+		database_name='{{var('dictionary_database', target.database)}}' and version_name='{{var('dictionary_database_version')}}' 
+	group by source_table_name
+	order by source_table_name   
+      {%- endset -%}
+   {% endif %}
+   
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}

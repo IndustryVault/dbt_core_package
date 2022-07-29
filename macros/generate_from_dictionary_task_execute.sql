@@ -13,7 +13,7 @@
    {% endset %}
    {% else %}
    {% set template %}
-      execute task {{ target.database }}_{@stage_table_name}_reload ;
+      execute task {{ target.database }}_{@stage_table_name}_refresh ;
    {% endset %}   {% endif %}
 
    {% if include_import_file == 'true' %}

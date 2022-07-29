@@ -67,7 +67,7 @@ CREATE OR REPLACE table {{ target.database }}.{{ target_schema }}.{@source_table
 		create or replace task {{ target.database }}_{@source_table_name}_truncate
 			ALLOW_OVERLAPPING_EXECUTION=FALSE
 			WAREHOUSE=INGESTION_WH
-			schedule='{{ var('load_start') }}'
+			schedule='{{ var('dictionary_load_start') }}'
 	    AS 
 	      truncate table {{ target.database }}.{{ target_schema }}.{@source_table_name};
 

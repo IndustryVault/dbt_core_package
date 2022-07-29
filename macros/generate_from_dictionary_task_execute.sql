@@ -1,4 +1,4 @@
-{% macro generate_from_dictionary_task_execute(dictionary_name='dictionary', target_schema='input', include_truncate='false', include_import_file='true') %}
+{% macro generate_from_dictionary_task_execute(dictionary_name='dictionary', target_schema='external', include_truncate='false', include_import_file='true') %}
    {% set temp=[] %}
 
    {% set header %}
@@ -9,7 +9,7 @@
 
    {% if include_truncate == 'true' %}
    {% set template %}
-      execute task {{ target.database }}_{@stage_table_name}_truncate ;
+      execute task {{ target.database }}_{{ target_schema }}_{@stage_table_name}_truncate ;
    {% endset %}
    {% else %}
    {% set template %}

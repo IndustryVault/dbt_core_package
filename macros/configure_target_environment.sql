@@ -1,4 +1,6 @@
 
+{% macro configure_target_environment() %}
+
 use role sysadmin;
 create database if not exists raw;
 create schema if not exists raw.{{var('dictionary_database')}}; 
@@ -38,3 +40,4 @@ grant usage on schema raw.{{var('dictionary_database')}} to role transform_role;
 grant select on all tables in schema raw.{{var('dictionary_database')}} to role transform_role;
 grant usage on schema raw.internal to role transform_role;
 grant select on all tables in schema raw.internal to role transform_role;
+{% endmacro %}

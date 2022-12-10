@@ -35,6 +35,17 @@ grant all privileges on future schemas in database {{var('dictionary_database')}
 grant all privileges on all tables in database {{var('dictionary_database')}} to role transform_role;
 grant all privileges on future tables in database {{var('dictionary_database')}} to role transform_role;
 
+-- permissions to the report_role
+grant usage on database {{var('dictionary_database')}} to role report_role;
+grant usage on schema {{var('dictionary_database')}}.public to role report_role;
+grant select on all tables in schema {{var('dictionary_database')}}.public to role report_role;
+grant select on future tables in schema {{var('dictionary_database')}}.public to role report_role;
+
+create schema if not exists raw.sigma_upload;
+grant usage on database raw to role report_role;
+grant usage on schema raw.signma_upload to role report_role;
+grant all on schema raw.sigma_upload to role report_role;
+
 grant usage on database raw to role transform_role;
 grant usage on schema raw.{{var('dictionary_database')}} to role transform_role;
 grant select on all tables in schema raw.{{var('dictionary_database')}} to role transform_role;

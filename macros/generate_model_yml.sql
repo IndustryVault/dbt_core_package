@@ -22,7 +22,7 @@ models:
     
     {% set query %}
     	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, t.tests_list, stage_column_type, source_column_name
-        from data_dictionary dd
+        from internal.data_dictionary dd
         left outer join {{ref('fannie_sflpd_tests')}} t on t.category='test' and dd.database_name=t.database_name and dd.version_name=t.version_name and dd.stage_table_name=t.table_name
         where 
             dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' 

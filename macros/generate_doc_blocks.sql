@@ -21,7 +21,7 @@
     {%- set query -%}
   	select  
 		source_table_name, stage_column_name, stage_column_description
-	from raw.internal.data_dictionary 
+	from internal.data_dictionary 
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and source_table_name='{{table_name}}'
 	order by stage_table_name, stage_column_name, column_order

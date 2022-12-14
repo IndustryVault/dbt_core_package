@@ -52,24 +52,24 @@ models:
             {% else %}
                 {% do sources_yaml.append('          metrics: ' ) %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
-                {% do sources_yaml.append('              label: "Count of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}
                 {% do sources_yaml.append('              type: count') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_min:') %}
-                {% do sources_yaml.append('              label: "Minimum of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Minimum"') %}
                 {% do sources_yaml.append('              type: min') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
-                {% do sources_yaml.append('              label: "Maximum of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
                 {% do sources_yaml.append('              type: max') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
                 {% if col.STAGE_COLUMN_TYPE == 'number' %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
-                    {% do sources_yaml.append('              label: "Sum of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                    {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
                     {% do sources_yaml.append('              type: sum') %}
                     {% do sources_yaml.append('              hidden: false' ) %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ 'avg:') %}
-                    {% do sources_yaml.append('              label: "Average of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                    {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Average"') %}
                     {% do sources_yaml.append('              type: average') %}
                     {% do sources_yaml.append('              hidden: false' ) %}
                 {% endif %}

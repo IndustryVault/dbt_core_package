@@ -47,7 +47,6 @@ models:
                 {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
                 {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
                 {% do sources_yaml.append('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
-                {% do sources_yaml.append('            sql: ' ) %}
                 {% do sources_yaml.append('            hidden: false' ) %}
                 {% do sources_yaml.append('            group_label: ' ~ col.STAGE_TABLE_NAME ) %}
             {% else %}
@@ -60,7 +59,7 @@ models:
                 {% do sources_yaml.append('              label: "Minimum of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('              type: min') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
-                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ 'max:') %}
+                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
                 {% do sources_yaml.append('              label: "Maximum of ' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('              type: max') %}
                 {% do sources_yaml.append('              hidden: false' ) %}

@@ -45,7 +45,6 @@ models:
             {% if col.STAGE_COLUMN_TYPE == 'string' %}
                 {% do sources_yaml.append('          dimension: ' ) %}
                 {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
-                {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
                 {% do sources_yaml.append('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            hidden: false' ) %}
                 {% do sources_yaml.append('            group_label: ' ~ col.STAGE_TABLE_NAME ) %}

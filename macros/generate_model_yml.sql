@@ -21,9 +21,8 @@ models:
    {% do sources_yaml.append(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
     
     {% set query %}
-    	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, t.tests_list, stage_column_type, source_column_name
+    	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name
         from internal.data_dictionary dd
-        left outer join {{ref('fannie_sflpd_tests')}} t on t.category='test' and dd.database_name=t.database_name and dd.version_name=t.version_name and dd.stage_table_name=t.table_name
         where 
             dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' 
             {{ apply_filter }}
@@ -42,25 +41,40 @@ models:
         {% do sources_yaml.append('      - name: ' ~ col.STAGE_COLUMN_NAME | lower) %}
         {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
         {% if add_lightdash %}
+            {% do sources_yaml.append('        meta: ' ) %}
             {% if col.STAGE_COLUMN_TYPE == 'string' %}
-                {% do sources_yaml.append('        meta: ' ) %}
                 {% do sources_yaml.append('          dimension: ' ) %}
                 {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
                 {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
-                {% do sources_yaml.append('            label: ' ~ col.SOURCE_COLUMN_NAME | lower) %}
-                {% do sources_yaml.append('            sql: ' ) %}
+                {% do sources_yaml.append('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            hidden: false' ) %}
                 {% do sources_yaml.append('            group_label: ' ~ col.STAGE_TABLE_NAME ) %}
-            {% endif %}
+            {% else %}
+                {% do sources_yaml.append('          metrics: ' ) %}
+                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
+                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}
+                {% do sources_yaml.append('              type: count') %}
+                {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_min:') %}
+                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Minimum"') %}
+                {% do sources_yaml.append('              type: min') %}
+                {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
+                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
+                {% do sources_yaml.append('              type: max') %}
+                {% do sources_yaml.append('              hidden: false' ) %}
+                {% if col.STAGE_COLUMN_TYPE == 'number' %}
+                    {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
+                    {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
+                    {% do sources_yaml.append('              type: sum') %}
+                    {% do sources_yaml.append('              hidden: false' ) %}
+                    {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ 'avg:') %}
+                    {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Average"') %}
+                    {% do sources_yaml.append('              type: average') %}
+                    {% do sources_yaml.append('              hidden: false' ) %}
+                {% endif %}
+	        {% endif %}
         {% endif %}
-        meta:
-          dimension:
-            type: boolean
-            label: Count Pre-Foreclosure Letters Sent
-            sql: "${TABLE}.pre_foreclosure_letter_sent_date IS NOT NULL"
-            hidden: false
-            group_label: foreclosure
-        
     {% endfor %} 
 
     {% set joined = sources_yaml | join ('\n') %}

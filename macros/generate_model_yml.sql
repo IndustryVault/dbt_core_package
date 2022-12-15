@@ -57,24 +57,29 @@ models:
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}
                 {% do sources_yaml.append('              type: count') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('              group_labdel: "' ~ col.STAGE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_min:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Minimum"') %}
                 {% do sources_yaml.append('              type: min') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('              group_labdel: "' ~ col.STAGE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
                 {% do sources_yaml.append('              type: max') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('              group_labdel: "' ~ col.STAGE_COLUMN_NAME ~ '"') %}
                 {% if col.IS_NUMBER_TYPE %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
                     {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
                     {% do sources_yaml.append('              type: sum') %}
                     {% do sources_yaml.append('              hidden: false' ) %}
+                    {% do sources_yaml.append('              group_labdel: "' ~ col.STAGE_COLUMN_NAME ~ '"') %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ 'avg:') %}
                     {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Average"') %}
                     {% do sources_yaml.append('              type: average') %}
                     {% do sources_yaml.append('              hidden: false' ) %}
-                {% endif %}
+                    {% do sources_yaml.append('              group_labdel: "' ~ col.STAGE_COLUMN_NAME ~ '"') %}
+               {% endif %}
 	        {% endif %}
         {% endif %}
     {% endfor %} 

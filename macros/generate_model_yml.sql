@@ -64,7 +64,7 @@ models:
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
                 {% do sources_yaml.append('              type: max') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
-                {% if col.STAGE_COLUMN_TYPE == 'number' %}
+                {% if col.STAGE_COLUMN_TYPE IN ('int', 'number(6,4)', 'number(20,2)') %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
                     {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
                     {% do sources_yaml.append('              type: sum') %}

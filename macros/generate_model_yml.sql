@@ -49,6 +49,8 @@ models:
                 {% do sources_yaml.append('            hidden: false' ) %}
                 {% do sources_yaml.append('            group_label: ' ~ col.STAGE_TABLE_NAME ) %}
             {% else %}
+                {% do sources_yaml.append('          dimension: ' ) %}
+                {% do sources_yaml.append('            hidden: true' ) %}
                 {% do sources_yaml.append('          metrics: ' ) %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}

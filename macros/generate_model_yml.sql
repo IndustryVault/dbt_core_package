@@ -54,7 +54,6 @@ models:
                 {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
                 {% do sources_yaml.append('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            hidden: false' ) %}
-                {% do sources_yaml.append('            group_label: ' ~ col.STAGE_TABLE_NAME ) %}
             {% else %}
                 {% do sources_yaml.append('          dimension: ' ) %}
                 {% do sources_yaml.append('            hidden: true' ) %}

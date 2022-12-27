@@ -23,8 +23,11 @@ models:
     {% set query %}
     	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name
             , case when stage_column_type = 'string' then 1
-                when stage-column_name = 'as_of_date' then 1
+                when stage_column_name = 'as_of_date' then 1
                 else 0 end is_dimension
+	        , case when stage_column_type != 'string' then 1
+                when stage_column_name = 'as_of_date' then 0
+                else 0 end is_metric
             , IFF(stage_column_type in ('int','number(6,4)','number(20,2)'),1,0) as is_number_type
         from internal.data_dictionary dd
         where 
@@ -55,6 +58,8 @@ models:
             {% else %}
                 {% do sources_yaml.append('          dimension: ' ) %}
                 {% do sources_yaml.append('            hidden: true' ) %}
+            {% endif %}
+            {% if col.IS_METRIC %}            
                 {% do sources_yaml.append('          metrics: ' ) %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}

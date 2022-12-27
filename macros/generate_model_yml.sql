@@ -21,10 +21,11 @@ models:
    {% do sources_yaml.append(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
     
     {% set query %}
-    	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name,
-            case when stage_column_type = 'string' then 1
+    	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name
+            , case when stage_column_type = 'string' then 1
                 when stage-column_name = 'as_of_date' then 1
                 else 0 end is_dimension
+            , IFF(stage_column_type in ('int','number(6,4)','number(20,2)'),1,0) as is_number_type
         from internal.data_dictionary dd
         where 
             dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' 
@@ -48,34 +49,40 @@ models:
             {% if col.IS_DIMENSION %}
                 {% do sources_yaml.append('          dimension: ' ) %}
                 {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
-                {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
                 {% do sources_yaml.append('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            hidden: false' ) %}
                 {% do sources_yaml.append('            group_label: ' ~ col.STAGE_TABLE_NAME ) %}
             {% else %}
+                {% do sources_yaml.append('          dimension: ' ) %}
+                {% do sources_yaml.append('            hidden: true' ) %}
                 {% do sources_yaml.append('          metrics: ' ) %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}
                 {% do sources_yaml.append('              type: count') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_min:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Minimum"') %}
                 {% do sources_yaml.append('              type: min') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
+                {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
                 {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
                 {% do sources_yaml.append('              type: max') %}
                 {% do sources_yaml.append('              hidden: false' ) %}
-                {% if col.STAGE_COLUMN_TYPE == 'number' %}
+                {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% if col.IS_NUMBER_TYPE %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
                     {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
                     {% do sources_yaml.append('              type: sum') %}
                     {% do sources_yaml.append('              hidden: false' ) %}
+                    {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                     {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ 'avg:') %}
                     {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Average"') %}
                     {% do sources_yaml.append('              type: average') %}
                     {% do sources_yaml.append('              hidden: false' ) %}
-                {% endif %}
+                    {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+               {% endif %}
 	        {% endif %}
         {% endif %}
     {% endfor %} 

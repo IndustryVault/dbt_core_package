@@ -21,7 +21,10 @@ models:
    {% do sources_yaml.append(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
     
     {% set query %}
-    	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name
+    	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name,
+            case when stage_column_type = 'string' then 1
+                when stage-column_name = 'as_of_date' then 1
+                else 0 end is_dimension
         from internal.data_dictionary dd
         where 
             dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' 
@@ -42,7 +45,7 @@ models:
         {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
         {% if add_lightdash %}
             {% do sources_yaml.append('        meta: ' ) %}
-            {% if col.STAGE_COLUMN_TYPE == 'string' %}
+            {% if col.IS_DIMENSION %}
                 {% do sources_yaml.append('          dimension: ' ) %}
                 {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
                 {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}

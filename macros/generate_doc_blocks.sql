@@ -1,4 +1,4 @@
-{% macro generate_doc_blocks(database_name, version_name, table_name, is_source_or_stage='Source') %}
+{% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='Source') %}
    {% set temp=[] %}
    {% set header %}
 (* comment *)
@@ -23,7 +23,7 @@
 		source_table_name, stage_column_name, stage_column_description
 	from internal.data_dictionary 
 	where 
-		database_name='{{database_name}}' and version_name='{{version_name}}'  and source_table_name='{{table_name}}'
+		database_name='{{database_name}}' and version_name='{{version_name}}'  and (source_table_name='{{table_name}}' OR '{{table_name}}'='ALL')
 	order by stage_table_name, stage_column_name, column_order
    {%- endset -%}
    {%- set tables = run_query(query) -%}   

@@ -68,7 +68,7 @@ sources:
         {% else %}
             {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_source_description' ~ '") }}\'' ) %}
         {% endif %}  
-	    {% if tbl.ALLOWS_NULL == false %}
+	    {% if col.ALLOWS_NULL == false %}
             {% do sources_yaml.append('            tests: ' ) %}
             {% do sources_yaml.append('              - not null' ) %}
 	    {% endif %}

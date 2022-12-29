@@ -28,7 +28,7 @@ sources:
    {% do sources_yaml.append(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
 
     {% set query %}
-    	select  source_table_name, stage_table_name, source_column_name, stage_column_description, stage_column_name, lower(stage_column_type) stage_column_type
+    	select  source_table_name, stage_table_name, source_column_name, stage_column_description, stage_column_name, lower(stage_column_type) stage_column_type, allows_null
         from internal.data_dictionary 
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 
@@ -67,7 +67,11 @@ sources:
             {% do sources_yaml.append('            description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' ) %}
         {% else %}
             {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_source_description' ~ '") }}\'' ) %}
-        {% endif %}            
+        {% endif %}  
+	    {% if tbl.ALLOWS_NULL == false %}
+            {% do sources_yaml.append('            tests: ' %}
+            {% do sources_yaml.append('              - not null' ) %}
+	    {% endif %}
         {% do sources_yaml.append('') %}
     {% endfor %}
 

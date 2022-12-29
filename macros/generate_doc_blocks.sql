@@ -20,7 +20,7 @@
 
     {%- set query -%}
   	select  
-		source_table_name, stage_column_name, stage_column_description
+		source_table_name, stage_table_name, stage_column_name, stage_column_description
 	from internal.data_dictionary 
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and (source_table_name='{{table_name}}' OR '{{table_name}}'='ALL')

@@ -29,7 +29,7 @@
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ table_name ~ '_' ~ tbl.STAGE_COLUMN_NAME ~ '_' ~ is_source_or_stage ) | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.STAGE_TABLE_NAME ~ '_' ~ tbl.STAGE_COLUMN_NAME ~ '_' ~ is_source_or_stage ) | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
   
      {% set footer %}

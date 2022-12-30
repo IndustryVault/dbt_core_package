@@ -15,7 +15,7 @@
 (* endcomment *)
    {%- endset -%}
    
-   {%- do temp.append(header | string | replace('{@doc_blockname}',  {{database_name}} ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
+   {%- do temp.append(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
    {% set template %}
 (* docs {@doc_blockname}_description *)

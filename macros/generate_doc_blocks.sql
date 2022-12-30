@@ -8,9 +8,14 @@
    The block is represented by the 'begin generation' comment and completed by 'end generation'
 
    [BEGIN GENERATION]
+
+(* docs {@doc_blockname}_description *)
+{@description}
+(* enddocs *)
 (* endcomment *)
    {%- endset -%}
-   {% do temp.append(header | string | replace('(*', '{%') | replace('*)', '%}') ) %}
+   
+   {%- do temp.append(template | string | replace('{@doc_blockname}',  {{database_name}} ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
    {% set template %}
 (* docs {@doc_blockname}_description *)

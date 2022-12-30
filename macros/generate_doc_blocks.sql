@@ -33,7 +33,7 @@
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage ~ '_description') | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
     {%- set query -%}
   	select  
@@ -46,7 +46,7 @@
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.STAGE_TABLE_NAME ~ '_' ~ tbl.STAGE_COLUMN_NAME ~ '_' ~ is_source_or_stage ~ '_description') | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.STAGE_TABLE_NAME ~ '_' ~ tbl.STAGE_COLUMN_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
   
      {% set footer %}

@@ -1,4 +1,4 @@
-{% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='Source') %}
+{% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
    {% set temp=[] %}
    {% set header %}
 (* comment *)
@@ -17,7 +17,23 @@
 {@description}
 (* enddocs *)
     {% endset %}
-
+    {%- set query -%}
+        select  distinct 
+            CASE 
+                WHEN '{{is_source_or_stage}}'='source' then source_table_name
+                WHEN '{{is_source_or_stage}}'='stage' then stage_table_name
+                ELSE '****'
+            end as table_name
+        from internal.data_dictionary 
+        where 
+            database_name='{{database_name}}' and version_name='{{version_name}}'  and (source_table_name='{{table_name}}' OR '{{table_name}}'='ALL')
+        order by stage_table_name, stage_column_name, column_order
+   {%- endset -%}
+   {%- set tables = run_query(query) -%}   
+   
+   {%- for tbl in tables -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage ~ '_description') | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
+   {%- endfor -%}
     {%- set query -%}
   	select  
 		source_table_name, stage_table_name, stage_column_name, stage_column_description
@@ -29,7 +45,7 @@
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.STAGE_TABLE_NAME ~ '_' ~ tbl.STAGE_COLUMN_NAME ~ '_' ~ is_source_or_stage ) | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.STAGE_TABLE_NAME ~ '_' ~ tbl.STAGE_COLUMN_NAME ~ '_' ~ is_source_or_stage ~ '_description') | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
   
      {% set footer %}

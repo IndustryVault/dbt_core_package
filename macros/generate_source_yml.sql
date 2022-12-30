@@ -18,7 +18,7 @@ version: 2
 
 sources:
   - name: raw__{{database_name | lower}}
-    description: '[[ doc("{{database_name ~ '_description' }}") ]]'
+    description: '[[ doc("{{database_name ~ '_source_description' }}") ]]'
     database: raw
     schema:  {{database_name}}
     loader:  Manual

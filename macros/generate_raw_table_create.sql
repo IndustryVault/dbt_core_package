@@ -5,7 +5,7 @@
    {% do temp.append(header | string ) %}
 
    {% set task_template %}
-use role develop_role;
+use role load_role;
 create or replace table raw.{{database_name}}.{@source_table_name} 
 (
     {@column_list_with_type}

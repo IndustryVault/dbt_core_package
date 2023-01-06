@@ -18,6 +18,15 @@ use role sysadmin;
     use role accountadmin;
     grant usage on schema raw.sigma_upload to role report_role;
     grant all on schema raw.sigma_upload to role report_role;
+    
+    use role securityadmin;
+    grant create schema on database raw to role load_role;
+    grant usage on database raw to role load_role;
+    grant all on database raw  to role load_role;
+    grant all privileges on all schemas in database raw to role load_role;
+    grant all privileges on future schemas in database raw to role load_role;
+    grant all privileges on all tables in database raw to role load_role;
+    grant all privileges on future tables in database raw to role load_role;
 
     use role sysadmin;
     grant usage on database raw to role transform_role;

@@ -1,4 +1,4 @@
-{% macro generate_from_dictionary_source_yml(database_name='default', version_name='default', is_external=false, apply_filter='') %}
+{% macro generate_from_dictionary_source_yml(database_name='default', version_name='default', apply_filter='') %}
 
     {% set sources_yaml=[] %}
 
@@ -28,8 +28,10 @@ sources:
    {% do sources_yaml.append(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
 
     {% set query %}
-    	select  source_table_name, stage_table_name, source_column_name, stage_column_description, stage_column_name, lower(stage_column_type) stage_column_type, allows_null
-        from internal.data_dictionary 
+    	select  
+            source_table_name, stage_table_name, source_column_name, stage_column_description
+            , stage_column_name, lower(stage_column_type) stage_column_type, allows_null
+	    from internal.data_dictionary 
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 
             {{ apply_filter }}
@@ -39,35 +41,20 @@ sources:
 
     {% set ns = namespace(last_table_name = 'NOT SET') %}
     {% for col in rowset %}
-        {% set current_table_name = col.STAGE_TABLE_NAME | string %}
-        {% if ns.last_table_name  != col.STAGE_TABLE_NAME | string %}
-            {% if is_external %}
-                {% do sources_yaml.append('      - name: "' ~  col.SOURCE_TABLE_NAME | lower ~ '"') %}
-            {% else %}
-                {% do sources_yaml.append('      - name: ' ~ col.STAGE_TABLE_NAME | lower) %}
-            {% endif %}            
-            {% if is_external %}
-                {% do sources_yaml.append('        description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}
-            {% else %}
-                {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_source_description' ~ '") }}\'' )  %}
+        {% set current_table_name = col.SOURCE_TABLE_NAME | string %}
+        {% if ns.last_table_name  != col.SOURCE_TABLE_NAME | string %}
+            {% do sources_yaml.append('      - name: "' ~  col.SOURCE_TABLE_NAME | lower ~ '"') %}
+            {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.SOURCE_TABLE_NAME ~ '_source_description' ~ '") }}\'' )  %}
             {% endif %}            
             {% do sources_yaml.append('        columns:') %}
-            {% set ns.last_table_name = col.STAGE_TABLE_NAME | string %}
+            {% set ns.last_table_name = col.SOURCE_TABLE_NAME | string %}
         {%endif %}
 
-        {% if is_external %}
-            {% set column_name = col.SOURCE_COLUMN_NAME %}
-        {% else %}
-            {% set column_name = col.STAGE_COLUMN_NAME %}
-        {% endif %}
         {% do sources_yaml.append('          - name: ' ~ column_name) %}
-        {% do sources_yaml.append('            data_type: ' ~ col.STAGE_COLUMN_TYPE ) %}
+        {% do sources_yaml.append('            data_type: ' ~ col.SOURCE_COLUMN_TYPE ) %}
         {% do sources_yaml.append('            quote: true' ) %}
-        {% if is_external %}
-            {% do sources_yaml.append('            description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' ) %}
-        {% else %}
-            {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_source_description' ~ '") }}\'' ) %}
-        {% endif %}  
+        {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.SOURCE_TABLE_NAME ~ '_' ~ col.SOURCE_COLUMN_NAME ~ '_source_description' ~ '") }}\'' ) %}
+        
 	    {% if col.ALLOWS_NULL == false %}
             {% do sources_yaml.append('            tests: ' ) %}
             {% do sources_yaml.append('              - not null' ) %}

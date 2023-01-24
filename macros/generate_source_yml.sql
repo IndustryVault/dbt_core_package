@@ -9,7 +9,7 @@
         {% set version_name = var('dictionary_database_version', 'default') %}
     {% endif %}
 
-    {% if is_external == 'false'}
+    {% if is_external == 'false' %}
         {% set source_name = 'raw__' ~ database_name | lower %}
         {% set source_description = '[[ doc("{{database_name ~ '_source_description' }}") ]]' %}
         {% set source_database = 'raw' %}

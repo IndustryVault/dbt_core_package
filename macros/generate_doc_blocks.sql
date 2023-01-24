@@ -52,7 +52,7 @@
                 WHEN '{{is_source_or_stage}}'='source' then source_column_name
                 WHEN '{{is_source_or_stage}}'='stage' then stage_column_name
                 ELSE '****'
-            end as column_name,
+            end as column_name
 	from internal.data_dictionary 
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and (table_name='{{table_name}}' OR '{{table_name}}'='ALL')

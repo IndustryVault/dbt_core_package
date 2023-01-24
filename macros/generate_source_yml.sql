@@ -30,7 +30,7 @@ sources:
     {% set query %}
     	select  
             source_table_name, stage_table_name, source_column_name, stage_column_description
-            , stage_column_name, lower(stage_column_type) stage_column_type, allows_null
+            , stage_column_name, source_column_type, lower(stage_column_type) stage_column_type, allows_null
 	    from internal.data_dictionary 
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 

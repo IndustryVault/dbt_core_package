@@ -32,7 +32,7 @@ sources:
   - name: {{source_name}}
     description: {{source_description}}
     database: {{source_database}}
-    schema:  {{database_schema}}
+    schema:  {{source_schema}}
     loader:  Manual
 
     tables:

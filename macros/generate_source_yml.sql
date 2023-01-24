@@ -43,13 +43,13 @@ sources:
     {% for col in rowset %}
         {% set current_table_name = col.SOURCE_TABLE_NAME | string %}
         {% if ns.last_table_name  != col.SOURCE_TABLE_NAME | string %}
-            {% do sources_yaml.append('      - name: "' ~  col.SOURCE_TABLE_NAME | lower ~ '"') %}
+            {% do sources_yaml.append('      - name: "' ~  col.SOURCE_TABLE_NAME ~ '"') %}
             {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.SOURCE_TABLE_NAME ~ '_source_description' ~ '") }}\'' )  %}          
             {% do sources_yaml.append('        columns:') %}
             {% set ns.last_table_name = col.SOURCE_TABLE_NAME | string %}
         {%endif %}
 
-        {% do sources_yaml.append('          - name: ' ~ col.SOURCE_COLUMN_NAME) %}
+        {% do sources_yaml.append('          - name: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
         {% do sources_yaml.append('            data_type: ' ~ col.SOURCE_COLUMN_TYPE ) %}
         {% do sources_yaml.append('            quote: true' ) %}
         {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.SOURCE_TABLE_NAME ~ '_' ~ col.SOURCE_COLUMN_NAME ~ '_source_description' ~ '") }}\'' ) %}

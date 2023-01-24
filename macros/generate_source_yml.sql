@@ -30,9 +30,10 @@ sources:
     {% set query %}
     	select  
             source_table_name, stage_table_name, source_column_name, stage_column_description
-            , stage_column_name, source_column_type, lower(stage_column_type) stage_column_type, allows_null
+            , stage_column_name, source_column_type, lower(stage_column_type) stage_column_type, allow_null
 	    , CASE WHEN '{{is_external}}' = 'false' then source_table_name else stage_table_name end as table_name
 	    , CASE WHEN '{{is_external}}' = 'false' then source_column_name else stage_column_name end as column_name
+	    , CASE WHEN '{{is_external}}' = 'false' then source_column_type else stage_column_type end as column_type
 	    , CASE WHEN '{{is_external}}' = 'false' then '_source_description' else '_stage_description' end as suffix
 	    
 	    from internal.data_dictionary 

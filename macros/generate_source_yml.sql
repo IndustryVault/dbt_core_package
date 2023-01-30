@@ -61,7 +61,7 @@ sources:
         {% if ns.last_table_name  != col.TABLE_NAME | string %}
 	        {% if is_external == 'false' %}
                 {% do sources_yaml.append('      - name: "' ~  col.TABLE_NAME ~ '"') %}
-                {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ col.suffix ~ '") }}\'' )  %}  
+                {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ col.SUFFIX ~ '") }}\'' )  %}  
             {% else %}
                 {% do sources_yaml.append('      - name: ' ~  col.TABLE_NAME ) %}
                 {% do sources_yaml.append('        description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}   
@@ -78,7 +78,7 @@ sources:
         {% do sources_yaml.append('            data_type: ' ~ col.COLUMN_TYPE ) %}
         {% do sources_yaml.append('            quote: true' ) %}
         {% if is_external == 'false' %}
-            {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ '_' ~ col.COLUMN_NAME ~ col.suffix ~ '") }}\'' ) %}
+            {% do sources_yaml.append('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ '_' ~ col.COLUMN_NAME ~ col.SUFFIX ~ '") }}\'' ) %}
         {% else %}
             {% do sources_yaml.append('            description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"') %}
         {% endif %}

@@ -53,9 +53,10 @@
                 WHEN '{{is_source_or_stage}}'='stage' then stage_column_name
                 ELSE '****'
             end as column_name
-	from internal.data_dictionary 
+	from {{ref('data_dictionary')}} 
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and (table_name='{{table_name}}' OR '{{table_name}}'='ALL')
+	and ('{{is_source_or_stage}}'='source' OR is_public)
 	order by stage_table_name, stage_column_name, column_order
    {%- endset -%}
    {%- set tables = run_query(query) -%}   

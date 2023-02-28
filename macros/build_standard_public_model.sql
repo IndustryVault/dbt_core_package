@@ -3,7 +3,7 @@
 
 {%- set query1 -%}
 	select  
-		distinct source_table_name, stage_table_name
+		distinct database_name, source_table_name, stage_table_name
 	from {{ ref('data_dictionary') }}
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
@@ -13,7 +13,8 @@
 {%- endset -%}
 
 {% if execute %}
-    {%- set source_table = run_query(query1)[0][0] %}  
+    {%- set raw_database_name  = 'raw__' ~ run_query(query1)[0][0] %}  
+    {%- set source_table = run_query(query1)[0][1] %}  
 {% else %}
     {%- set source_table = '' %}  
 {% endif %}
@@ -38,7 +39,7 @@ WITH filtered as (
 		"{{column.SOURCE_COLUMN_NAME}}"::{{column.STAGE_COLUMN_TYPE}}  AS {{column.STAGE_COLUMN_NAME}}
         {% endfor %}
 {% if execute %}
-	from {{ source('raw__ldf_template', source_table) }}
+	from {{ source(raw_database_name, source_table) }}
 {% endif %}
 )  
 

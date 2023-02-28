@@ -33,9 +33,9 @@ models:
                 else 0 
 		end is_metric
             , IFF(stage_column_type in ('int','number(6,4)','number(20,2)'),1,0) as is_number_type
-        from internal.data_dictionary dd
+        from {{ref('data_dictionary')}} dd
         where 
-            dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' 
+            dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' and dd.is_public
             {{ apply_filter }}
 	    order by dd.stage_table_name, dd.column_order
     {% endset %}

@@ -1,7 +1,6 @@
-{% macro generate_raw_table_load(database_name, version_name, table_name) %}
+{% macro generate_raw_table_load(database_name, version_name, table_name, stage_url) %}
    {% set temp=[] %}
 
-   {% set stage_url= var('dictionary_external_stage') | string %}
    {% set header %}
    use role accountadmin;
    create file format if not exists raw.{{ database_name }}.{{ database_name }}_{{ table_name }}_file_format

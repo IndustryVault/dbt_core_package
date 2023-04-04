@@ -7,6 +7,7 @@ use role sysadmin;
     create schema if not exists raw.{{var('dictionary_database')}}; 
     create schema if not exists raw.internal; 
 
+    use role accountadmin;
     grant usage on database raw to role develop_role;
     grant usage on schema raw.{{var('dictionary_database')}} to role develop_role;
     grant select on all tables in schema raw.{{var('dictionary_database')}} to role develop_role;
@@ -14,7 +15,7 @@ use role sysadmin;
    
     create schema if not exists raw.sigma_upload;
     grant usage on database raw to role report_role;
-    use role accountadmin;
+
     grant usage on schema raw.sigma_upload to role report_role;
     grant all on schema raw.sigma_upload to role report_role;
     

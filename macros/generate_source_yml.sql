@@ -85,7 +85,7 @@ sources:
         
         {% if col.ALLOW_NULL == false %}
             {% do sources_yaml.append('            tests: ' ) %}
-            {% do sources_yaml.append('              - not null' ) %}
+            {% do sources_yaml.append('              - not_null' ) %}
         {% endif %}
         {% do sources_yaml.append('') %}
     {% endfor %}

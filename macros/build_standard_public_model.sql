@@ -10,6 +10,7 @@
 		and stage_table_name='{{model_name}}' 
 		and stage_column_name is not null
         and is_public = 1
+	order by stage_column_name
 {%- endset -%}
 
 {% if execute %}

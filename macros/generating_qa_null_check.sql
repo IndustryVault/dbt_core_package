@@ -16,7 +16,7 @@
     {%- set query -%}
 	select  
 		DISTINCT stage_table_name as table_name, stage_column_name as column_name
-	from internal.dictionary 
+	from internal.data_dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 	group by stage_table_name, stage_column_name

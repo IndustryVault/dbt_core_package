@@ -25,7 +25,7 @@
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
-  {%- if not loop.first %} do temp.append('UNION ALL') {% endif %}
+   	{%- if not loop.first %} do temp.append('UNION ALL' | string ) {% endif %}
       {% do temp.append(template | string | replace('{@table_name}', tbl.TABLE_NAME) | replace('{@column_name}', tbl.COLUMN_NAME) ) %}
    {% endfor %}
 

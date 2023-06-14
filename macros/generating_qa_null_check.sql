@@ -15,12 +15,12 @@
    
     {%- set query -%}
 	select  
-		DISTINCT stage_table_name as table_name, stage_column_name as column_name
+		DISTINCT source_table_name as table_name, source_column_name as column_name
 	from internal.data_dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-	group by stage_table_name, stage_column_name
-	order by stage_table_name, stage_column_name
+	group by source_table_name, source_column_name
+	order by source_table_name, source_column_name
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    

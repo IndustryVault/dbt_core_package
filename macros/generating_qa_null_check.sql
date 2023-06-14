@@ -10,7 +10,7 @@
    {%- endset -%}  
    
    {% set template %}
-       Select '{@table_name}' as table_name, '{@column_name}' as column_name, count(*) row_count, count({@column_name}) not_null_count, count(*) - count({@column_name}) null_count, max(as_of_dt) max_date, min(as_of_dt) as min_date, count from bkmrtg.{@table_name}
+       Select '{@table_name}' as table_name, '{@column_name}' as column_name, count(*) row_count, count({@column_name}) not_null_count, count(*) - count({@column_name}) null_count, max(as_of_dt) max_date, min(as_of_dt) as min_date, count from bkmrtg.tb_ldf_{@table_name}
    {% endset %}
    
     {%- set query -%}

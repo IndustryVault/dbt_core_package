@@ -20,6 +20,7 @@
 	from internal.data_dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
+		and LEFT(upper(source_column_name),8) != 'PROCESS_'
 	group by table_name, source_column_name, source_column_description
 	order by table_name, source_column_name, description
    {%- endset -%}

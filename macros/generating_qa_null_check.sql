@@ -20,8 +20,8 @@
 	from internal.data_dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-	group by source_table_name, source_column_name
-	order by source_table_name, source_column_name
+	group by source_table_name, source_column_name, source_column_description
+	order by source_table_name, source_column_name, source_column_description
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    

@@ -15,18 +15,18 @@
    {% endset %}
    
     {%- set query -%}
-    	select DISTINCT 
+        select DISTINCT 
 		CASE WHEN startswith(upper(source_table_name), 'LDF_MONTHLY') THEN CONCAT(REPLACE(upper(source_table_name), '_MONTHLY',''),'_MONTHLY') 
-			WHEN contains(upper(source_table_name), 'DEED_IN_LIEU') THEN REPLACE(upper(source_table_name), 'DEED_IN_LIEU','DIL')
-		ELSE source_table_name 
-		end as table_name
+			ELSE source_table_name 
+			end as temp_table_name
+		, CASE WHEN contains(upper(temp_table_name), 'DEED_IN_LIEU') THEN REPLACE(upper(temp_table_name), 'DEED_IN_LIEU','DIL') ELSE temp_table_name END as table_name
 		, source_column_name as column_name, REPLACE(source_column_description, '''','') as description
 	from internal.data_dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 		and LEFT(upper(source_column_name),8) != 'PROCESS_'
-	group by table_name, source_column_name, source_column_description
-	order by table_name, source_column_name, description
+	group by temp_table_name, table_name, source_column_name, source_column_description
+	order by temp_table_name, table_name, source_column_name, description
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    

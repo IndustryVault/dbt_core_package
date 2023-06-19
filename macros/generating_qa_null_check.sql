@@ -15,13 +15,13 @@
    {% endset %}
    
     {%- set query -%}
-	select  
-		DISTINCT source_table_name as table_name, source_column_name as column_name, REPLACE(source_column_description, '''','') as description
+    	select
+    		DISTINCT CASE WHEN startswith(upper(source_table_name), 'LDF_MONTHLY') THEN CONCAT(REPLACE(upper(source_table_name), '_MONTHLY',''),'_MONTHLY') ELSE source_table_name end as table_name, source_column_name as column_name, REPLACE(source_column_description, '''','') as description
 	from internal.data_dictionary 
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-	group by source_table_name, source_column_name, source_column_description
-	order by source_table_name, source_column_name, description
+	group by table_name, source_column_name, source_column_description
+	order by table_name, source_column_name, description
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    

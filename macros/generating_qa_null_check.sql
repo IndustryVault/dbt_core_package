@@ -14,7 +14,7 @@
        , count(*) - count({@column_name}) null_count, max(as_of_dt) max_date, min(as_of_dt) as min_date from bkmrtg.tb_{@table_name}
    {% endset %}
 
-	{%- set query1 -%}
+	{%- set query -%}
 	with mapping as
 (
     select replace(upper(boddh_table_name),'TB_','') as boddh_table_name

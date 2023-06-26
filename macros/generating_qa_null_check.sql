@@ -11,9 +11,13 @@
    
    {% set template %}
        Select '{@table_name}' as table_name, '{@column_name}' as column_name, '{@description}' as description, count(*) row_count, count({@column_name}) not_null_count
+       , count(*) - count({@column_name}) null_count, max(as_of_dt) max_date, min(as_of_dt) as min_date from bnkns.{@table_name}
+   {% endset %}
+	
+   {% set template2 %}
+       Select '{@table_name}' as table_name, '{@column_name}' as column_name, '{@description}' as description, count(*) row_count, count({@column_name}) not_null_count
        , count(*) - count({@column_name}) null_count, max(as_of_dt) max_date, min(as_of_dt) as min_date from bkmrtg.tb_{@table_name}
    {% endset %}
-
 	{%- set query -%}
 	with mapping as
 (

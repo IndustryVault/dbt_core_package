@@ -11,7 +11,7 @@
    
    {% set template %}
        Select '{@table_name}' as table_name, '{@column_name}' as column_name, '{@description}' as description, count(*) row_count, count({@column_name}) not_null_count
-       , count(*) - count({@column_name}) null_count, max(valid_to_ts) max_date, min(valid_from_ts) as min_date from bnkns.{@table_name}
+       , count(*) - count({@column_name}) null_count, max(etl_recorded_GMTS) max_date, min(etl_recorded_GMTS) as min_date from bnkns.{@table_name}
    {% endset %}
 	
    {% set template2 %}

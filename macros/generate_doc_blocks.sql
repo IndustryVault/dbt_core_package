@@ -4,54 +4,29 @@
    {% set header %}
 (* comment *)
 
-   The following section of doc blocks was generated using the macro generate_doc_blocks. Editing could be wiped out when this block is replaced.
+   The following section of doc blocks was generated using the macro generate_doc_blocks. All description values come from the data_dictionary model and should not be edited
+	here under any circumstances. Update the source material to change the data dictionary and then re-generate this file.
 
    The block is represented by the 'begin generation' comment and completed by 'end generation'
 
    [BEGIN GENERATION]
 
-(* docs {@doc_blockname}_description *)
-{@description}
-(* enddocs *)
-(* docs {@doc_blockname}_description_not_provided *)
-Not Provided
-(* enddocs *)
 (* endcomment *)
    {%- endset -%}
    
-   {%- do temp.append(header | string | replace('{@doc_blockname}',  not_provided) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
+   {%- do temp.append(header | string | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
    {% set template %}
 (* docs {@doc_blockname}_description *)
 {@description}
 (* enddocs *)
-    {% endset %}
-    {%- set query -%}
-        select  distinct 
-            CASE 
-                WHEN '{{is_source_or_stage}}'='source' then source_table_name
-                WHEN '{{is_source_or_stage}}'='stage' then stage_table_name
-                ELSE '****'
-            end as table_name,
-	    source_table_name
-        from internal.data_dictionary 
-        where 
-            database_name='{{database_name}}' and version_name='{{version_name}}'  and (source_table_name='{{table_name}}' OR '{{table_name}}'='ALL')
-        order by 1
-   {%- endset -%}
-   {%- set tables = run_query(query) -%}   
+    {% endset %} 
    
    {%- for tbl in tables -%}
       {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
     {%- set query -%}
   	select  
-		source_table_name, stage_table_name, stage_column_name, stage_column_description,
-	     CASE 
-                WHEN '{{is_source_or_stage}}'='source' then source_column_description
-                WHEN '{{is_source_or_stage}}'='stage' then stage_column_description
-                ELSE '****'
-            end as column_description,
 	   CASE 
                 WHEN '{{is_source_or_stage}}'='source' then source_table_name
                 WHEN '{{is_source_or_stage}}'='stage' then stage_table_name
@@ -61,13 +36,18 @@ Not Provided
                 WHEN '{{is_source_or_stage}}'='source' then source_column_name
                 WHEN '{{is_source_or_stage}}'='stage' then stage_column_name
                 ELSE '****'
-            end as column_name
+            end as column_name,
+	CASE 
+                WHEN '{{is_source_or_stage}}'='source' then source_column_description
+                WHEN '{{is_source_or_stage}}'='stage' then stage_column_description
+                ELSE '****'
+            end as column_description
+
 	from {{ref('data_dictionary')}} 
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and (table_name='{{table_name}}' OR '{{table_name}}'='ALL')
 	and ('{{is_source_or_stage}}'='source' OR is_public)
-    where 
-	order by stage_table_name, stage_column_name, column_order
+	and column_description is not null
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    

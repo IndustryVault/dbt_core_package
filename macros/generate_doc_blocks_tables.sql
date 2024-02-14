@@ -1,7 +1,7 @@
 {% macro generate_doc_blocks_tables(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
    {% set temp=[] %}
 
-   {% set header %}
+{% set header %}
 (* comment *)
 
   The following section of doc blocks was generated using the macro generate_doc_blocks_tables. Which standardizes the names of the doc blocks but does not have any description information.
@@ -17,15 +17,16 @@
 (* docs {@doc_blockname}_description *)
 Not Provided
 (* enddocs *)
-   {%- endset -%}
+{%- endset -%} 
    
-   {%- do temp.append(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage)  | replace('(*', '{%') | replace('*)', '%}') ) -%}
+{%- do temp.append(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage)  | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
-   {% set template %}
+{% set template %}
 (* docs {@doc_blockname}_description *)
-{@description}
+Not Provided
 (* enddocs *)
-    {% endset %}
+{% endset %}
+	
     {%- set query -%}
         select  distinct 
             CASE 
@@ -42,10 +43,9 @@ Not Provided
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
 
-  
      {% set footer %}
 (* comment *)
    [END GENERATION]

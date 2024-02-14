@@ -19,7 +19,7 @@ Not Provided
 (* enddocs *)
    {%- endset -%}
    
-   {%- do temp.append(header | string | replace('{@doc_blockname}',  not_provided)  | replace('(*', '{%') | replace('*)', '%}') ) -%}
+   {%- do temp.append(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage)  | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
    {% set template %}
 (* docs {@doc_blockname}_description *)

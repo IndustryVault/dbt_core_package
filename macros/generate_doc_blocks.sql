@@ -1,5 +1,6 @@
 {% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
    {% set temp=[] %}
+{% set not_provided = database_name ~ '_' ~ is_source_or_stage %}
    {% set header %}
 (* comment *)
 
@@ -12,10 +13,13 @@
 (* docs {@doc_blockname}_description *)
 {@description}
 (* enddocs *)
+(* docs {@doc_blockname}_description_not_provided *)
+Not Provided
+(* enddocs *)
 (* endcomment *)
    {%- endset -%}
    
-   {%- do temp.append(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
+   {%- do temp.append(header | string | replace('{@doc_blockname}',  not_provided) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
    {% set template %}
 (* docs {@doc_blockname}_description *)
@@ -44,6 +48,11 @@
   	select  
 		source_table_name, stage_table_name, stage_column_name, stage_column_description,
 	     CASE 
+                WHEN '{{is_source_or_stage}}'='source' then source_column_description
+                WHEN '{{is_source_or_stage}}'='stage' then stage_column_description
+                ELSE '****'
+            end as column_description,
+	   CASE 
                 WHEN '{{is_source_or_stage}}'='source' then source_table_name
                 WHEN '{{is_source_or_stage}}'='stage' then stage_table_name
                 ELSE '****'
@@ -57,12 +66,13 @@
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and (table_name='{{table_name}}' OR '{{table_name}}'='ALL')
 	and ('{{is_source_or_stage}}'='source' OR is_public)
+    where 
 	order by stage_table_name, stage_column_name, column_order
    {%- endset -%}
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ tbl.COLUMN_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', tbl.STAGE_COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ tbl.COLUMN_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', tbl.COLUMN_DESCRIPTION) | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
   
      {% set footer %}

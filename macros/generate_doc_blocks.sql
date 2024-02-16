@@ -16,15 +16,6 @@
    
    {%- do temp.append(header | string | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
-   {% set template %}
-(* docs {@doc_blockname}_description *)
-{@description}
-(* enddocs *)
-    {% endset %} 
-   
-   {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('{@description}', 'Not Provided') | replace('(*', '{%') | replace('*)', '%}') ) -%}
-   {%- endfor -%}
     {%- set query -%}
   	select  
 	   CASE 

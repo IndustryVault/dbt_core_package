@@ -1,6 +1,5 @@
 {% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
    {% set temp=[] %}
-{% set not_provided = database_name ~ '_' ~ is_source_or_stage %}
    {% set header %}
 (* comment *)
 
@@ -16,7 +15,13 @@
    
    {%- do temp.append(header | string | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
-    {%- set query -%}
+{% set template %}
+(* docs {@doc_blockname}_description *)
+{@description}
+(* enddocs *)
+{% endset %}
+
+	{%- set query -%}
   	select  
 	   CASE 
                 WHEN '{{is_source_or_stage}}'='source' then source_table_name

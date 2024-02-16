@@ -33,11 +33,10 @@ Not Provided
                 WHEN '{{is_source_or_stage}}'='source' then source_table_name
                 WHEN '{{is_source_or_stage}}'='stage' then stage_table_name
                 ELSE '****'
-            end as table_name,
-	    source_table_name
+            end as table_name
         from internal.data_dictionary 
         where 
-            database_name='{{database_name}}' and version_name='{{version_name}}'  and (source_table_name='{{table_name}}' OR '{{table_name}}'='ALL')
+            database_name='{{database_name}}' and version_name='{{version_name}}'  and (table_name='{{table_name}}' OR '{{table_name}}'='ALL')
         order by 1
    {%- endset -%}
    {%- set tables = run_query(query) -%}   

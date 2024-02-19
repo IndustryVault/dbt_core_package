@@ -54,7 +54,7 @@ sources:
             {{ apply_filter }}
 	    order by stage_table_name, column_order
     {% endset %}
-	{% print("query to run: " ~ query) %}
+	{% print("query to run: " ~ query | string) %}
     {% set rowset=run_query(query) %}
 
     {% set ns = namespace(last_table_name = 'NOT SET') %}

@@ -50,7 +50,7 @@ sources:
 	    from internal.data_dictionary 
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 
-	    stage_table_name like 'l%'
+	    and stage_table_name like 'l%'
             {{ apply_filter }}
 	    order by stage_table_name, column_order
     {% endset %}

@@ -9,7 +9,11 @@
 
     {% if is_external == 'false' %}
         {% set source_name = 'raw__' ~ database_name | lower %}
-        {% set source_description = '\'[[ doc("' ~ database_name ~ '_source_description'  ~ '") ]]\'' %}
+    	{% if description_method == 'reference' %}
+            {% set source_description = '\'[[ doc("' ~ database_name ~ '_source_description'  ~ '") ]]\'' %}
+        {% else %}
+    		{% set source_description = 'Not Provided' )  %}
+        {% endif %}
         {% set source_database = 'raw' %}
         {% set source_schema = database_name %}
     {% else %}

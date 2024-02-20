@@ -1,4 +1,4 @@
-{% macro generate_raw_table_create(database_name='default', version_name='default', table_name, use_source=true) %}
+{% macro generate_raw_table_create(database_name='default', version_name='default', use_source=true, table_name) %}
 
     {% if database_name=='default' %}
         {% set database_name = var('dictionary_database', target.database) %}

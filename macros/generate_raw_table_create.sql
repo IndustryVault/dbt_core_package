@@ -1,9 +1,9 @@
 {% macro generate_raw_table_create(database_name, version_name, table_name, use_source=true) %}
-   {% set temp=[] %}
-   {% set header %}
+
+{% set header %}
 use role load_role;
-   {%- endset -%}
-   {% do temp.append(header | string ) %}
+{%- endset -%}
+   {% do print(header | string ) %}
 
    {% set task_template %}
 create or replace table raw.{{database_name}}.{@source_table_name} 
@@ -29,10 +29,7 @@ create or replace table raw.{{database_name}}.{@source_table_name}
       {% if use_source %}
          {% set column_list = tbl.SOURCE_COLUMN_LIST %}
       {% endif %}
-      {% do temp.append(task_template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@column_list_with_type}', column_list) ) %}
+      {% do print(task_template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@column_list_with_type}', column_list) ) %}
    {% endfor %}
-
-   {% set results = temp | join ('\n') %}
-   {{ log(results, info=True) }}
-   {% do return(results) %}
+	    
 {% endmacro %}

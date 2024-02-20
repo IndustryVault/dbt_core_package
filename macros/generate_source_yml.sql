@@ -51,7 +51,6 @@ sources:
 	    from internal.data_dictionary 
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 
-	    and stage_table_name like 'loandetails%'
             {{ apply_filter }}
 	    order by source_table_name, column_order
    

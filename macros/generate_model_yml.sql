@@ -1,6 +1,4 @@
-{% macro generate_from_dictionary_model_yml(database_name='default', version_name='default', apply_filter='',add_lightdash=false) %}
-
-    {% set sources_yaml=[] %}
+{% macro generate_from_dictionary_model_yml(database_name='default', version_name='default', description_method='none', apply_filter='',add_lightdash=false) %}
 
     {% if database_name=='default' %}
         {% set database_name = var('dictionary_database', target.database) %}
@@ -18,7 +16,7 @@ version: 2
 
 models:
    {%- endset -%}
-   {% do sources_yaml.append(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
+   {% do print(header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') ) %}
     
     {% set query %}
     	select DISTINCT dd.stage_table_name, dd.stage_column_name, dd.column_order, dd.stage_column_description, stage_column_type, source_column_name
@@ -44,52 +42,57 @@ models:
     {% set ns = namespace(last_table_name = 'NOT SET') %}
     {% for col in rowset %}
         {% if ns.last_table_name != col.STAGE_TABLE_NAME | string %}
-            {% do sources_yaml.append('  - name: ' ~ col.STAGE_TABLE_NAME | lower ) %}
-            {% do sources_yaml.append('    columns:') %}
+            {% do print('  - name: ' ~ col.STAGE_TABLE_NAME | lower ) %}
+            {% do print('    columns:') %}
             {% set ns.last_table_name = col.STAGE_TABLE_NAME | string %}
         {%endif %}
 
-        {% do sources_yaml.append('      - name: ' ~ col.STAGE_COLUMN_NAME | lower) %}
-        {% do sources_yaml.append('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
+        {% do print('      - name: ' ~ col.STAGE_COLUMN_NAME | lower) %}
+	{% if description_method = 'reference' %}
+        {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
+	{% elif description_method = 'direct' %}
+            {% do print('            description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}  
+	{% endif %}
+
         {% if add_lightdash %}
-            {% do sources_yaml.append('        meta: ' ) %}
+            {% do print('        meta: ' ) %}
             {% if col.IS_DIMENSION %}
-                {% do sources_yaml.append('          dimension: ' ) %}
-                {% do sources_yaml.append('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
-                {% do sources_yaml.append('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
-                {% do sources_yaml.append('            hidden: false' ) %}
+                {% do print('          dimension: ' ) %}
+                {% do print('            type: ' ~ col.STAGE_COLUMN_TYPE | lower) %}
+                {% do print('            label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do print('            hidden: false' ) %}
             {% else %}
-                {% do sources_yaml.append('          dimension: ' ) %}
-                {% do sources_yaml.append('            hidden: true' ) %}
+                {% do print('          dimension: ' ) %}
+                {% do print('            hidden: true' ) %}
             {% endif %}
             {% if col.IS_METRIC %}            
-                {% do sources_yaml.append('          metrics: ' ) %}
-                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
-                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}
-                {% do sources_yaml.append('              type: count') %}
-                {% do sources_yaml.append('              hidden: false' ) %}
-                {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
-                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_min:') %}
-                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Minimum"') %}
-                {% do sources_yaml.append('              type: min') %}
-                {% do sources_yaml.append('              hidden: false' ) %}
-                {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
-                {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
-                {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
-                {% do sources_yaml.append('              type: max') %}
-                {% do sources_yaml.append('              hidden: false' ) %}
-                {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do print('          metrics: ' ) %}
+                {% do print('            ' ~ col.STAGE_COLUMN_NAME ~ '_count:') %}
+                {% do print('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Count"') %}
+                {% do print('              type: count') %}
+                {% do print('              hidden: false' ) %}
+                {% do print('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do print('            ' ~ col.STAGE_COLUMN_NAME ~ '_min:') %}
+                {% do print('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Minimum"') %}
+                {% do print('              type: min') %}
+                {% do print('              hidden: false' ) %}
+                {% do print('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                {% do print('            ' ~ col.STAGE_COLUMN_NAME ~ '_max:') %}
+                {% do print('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Maximum"') %}
+                {% do print('              type: max') %}
+                {% do print('              hidden: false' ) %}
+                {% do print('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                 {% if col.IS_NUMBER_TYPE %}
-                    {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
-                    {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
-                    {% do sources_yaml.append('              type: sum') %}
-                    {% do sources_yaml.append('              hidden: false' ) %}
-                    {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
-                    {% do sources_yaml.append('            ' ~ col.STAGE_COLUMN_NAME ~ 'avg:') %}
-                    {% do sources_yaml.append('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Average"') %}
-                    {% do sources_yaml.append('              type: average') %}
-                    {% do sources_yaml.append('              hidden: false' ) %}
-                    {% do sources_yaml.append('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                    {% do print('            ' ~ col.STAGE_COLUMN_NAME ~ '_sum:') %}
+                    {% do print('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Sum"') %}
+                    {% do print('              type: sum') %}
+                    {% do print('              hidden: false' ) %}
+                    {% do print('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
+                    {% do print('            ' ~ col.STAGE_COLUMN_NAME ~ 'avg:') %}
+                    {% do print('              label: "' ~ col.SOURCE_COLUMN_NAME ~ ' - Average"') %}
+                    {% do print('              type: average') %}
+                    {% do print('              hidden: false' ) %}
+                    {% do print('              group_label: "' ~ col.SOURCE_COLUMN_NAME ~ '"') %}
                {% endif %}
 	        {% endif %}
         {% endif %}

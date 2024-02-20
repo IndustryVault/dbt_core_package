@@ -12,7 +12,7 @@
     	{% if description_method == 'reference' %}
             {% set source_description = '\'[[ doc("' ~ database_name ~ '_source_description'  ~ '") ]]\'' %}
         {% else %}
-    		{% set source_description = 'Not Provided' )  %}
+    		{% set source_description = 'Not Provided'  %}
         {% endif %}
         {% set source_database = 'raw' %}
         {% set source_schema = database_name %}

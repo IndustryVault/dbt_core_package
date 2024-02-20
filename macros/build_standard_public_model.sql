@@ -36,7 +36,7 @@ WITH filtered as (
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
 		    {%- if not loop.first %},{% endif -%}
-		"{{column.SOURCE_COLUMN_NAME}}"::{{column.STAGE_COLUMN_TYPE}}  AS {{column.STAGE_COLUMN_NAME}}
+		"{{column.SOURCE_COLUMN_NAME}}"::{{column.STAGE_COLUMN_TYPE}}  AS "{{column.STAGE_COLUMN_NAME}}"
         {% endfor %}
 {% if execute %}
 	from {{ source(raw_database_name, source_table) }}

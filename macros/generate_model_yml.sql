@@ -52,7 +52,7 @@ models:
 	{% if description_method == 'reference' %}
         {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
 	{% elif description_method == 'direct' %}
-        {% do print('            description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}  
+        {% do print('        description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}  
 	{% endif %}
 
         {% if add_lightdash %}

@@ -35,10 +35,10 @@
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
 		    {%- if not loop.first %},{% endif -%}
-        {% do print('\t\t' ~ column.STAGE_COLUMN_NAME ~ '::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
+        {% do print('\t\t"' ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}
-	{% do print( '\tfrom {{ source("' ~ raw_database_name ~'"," ~ source_table ~ ') }}') %}
+	{% do print( '\tfrom {{ source("' ~ raw_database_name ~'","' ~ source_table ~ '") }}') %}
 {% endif %}
 
 {% do print('\nselect \n\t *\nfrom filtered') %}

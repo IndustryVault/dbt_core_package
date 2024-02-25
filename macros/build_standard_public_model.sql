@@ -1,6 +1,5 @@
 {% macro build_standard_public_model(model_name) -%}
 
-
 {%- set query1 -%}
 	select  
 		distinct database_name, source_table_name, stage_table_name
@@ -30,13 +29,13 @@
         and is_public = 1
 	order by stage_column_name
 {%- endset -%}
-
-WITH filtered as ( 
-	select  
+{{ print('\n') }}
+{{ print ('WITH filtered as ( ') }}
+{{ print ('	select  ') }}
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
 		    {%- if not loop.first %},{% endif -%}
-		"{{column.SOURCE_COLUMN_NAME}}"::{{column.STAGE_COLUMN_TYPE}}  AS "{{column.STAGE_COLUMN_NAME}}"
+		{{ print ("{{column.SOURCE_COLUMN_NAME}}"::{{column.STAGE_COLUMN_TYPE}}  AS "{{column.STAGE_COLUMN_NAME}}" )}}
         {% endfor %}
 {% if execute %}
 	from {{ source(raw_database_name, source_table) }}

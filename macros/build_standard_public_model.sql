@@ -38,7 +38,7 @@
         {% do print('\t\t' ~ column.STAGE_COLUMN_NAME ~ '::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}
-	{% do print( '\tfrom {{ source("' ~ raw_database_name ~'"," ~ source_table ~ ')' }}
+	{% do print( '\tfrom {{ source("' ~ raw_database_name ~'"," ~ source_table ~ ') }}') %}
 {% endif %}
 
 {% do print('\nselect \n\t *\nfrom filtered') %}

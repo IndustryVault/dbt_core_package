@@ -41,6 +41,6 @@
 	{% do print( ')\n\tfrom {{ source("' ~ raw_database_name ~'","' ~ source_table ~ '") }}') %}
 {% endif %}
 
-{% do print('\nselect \n\t *\nfrom filtered') %}
+{% do print(')\n\nselect \n\t *\nfrom filtered') %}
 
 {%- endmacro %}

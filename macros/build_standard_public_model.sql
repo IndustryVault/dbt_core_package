@@ -29,13 +29,13 @@
         and is_public = 1
 	order by stage_column_name
 {%- endset -%}
-{{ print('\n') }}
-{{ print ('WITH filtered as ( ') }}
-{{ print ('	select  ') }}
+{% do print('\n') %}
+{% do print ('WITH filtered as ( ') %}
+{% do print ('	select  ') %}
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
 		    {%- if not loop.first %},{% endif -%}
-		{{ print ("{{column.SOURCE_COLUMN_NAME}}"::{{column.STAGE_COLUMN_TYPE}}  AS "{{column.STAGE_COLUMN_NAME}}" )}}
+        {% do print(col.STAGE_COLUMN_NAME ~ '::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}
 	from {{ source(raw_database_name, source_table) }}

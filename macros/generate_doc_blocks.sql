@@ -1,5 +1,12 @@
 {% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
-   {% set header %}
+     {% if database_name=='default' %}
+        {% set database_name = var('dictionary_database', target.database) %}
+    {% endif %}
+    {% if version_name=='default' %}
+        {% set version_name = var('dictionary_database_version', 'default') %}
+    {% endif %}
+	
+{% set header %}
 (* comment *)
 
    The following section of doc blocks was generated using the macro generate_doc_blocks. All description values come from the data_dictionary model and should not be edited

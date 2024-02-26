@@ -1,11 +1,10 @@
-{% macro generate_from_dictionary_task_execute(dictionary_name='dictionary', target_schema='external', include_truncate='false', include_import_file='true') %}
-   {% set temp=[] %}
+{% macro generate_from_dictionary_task_execute(dictionary_name='data_dictionary', target_schema='external', include_truncate='false', include_import_file='true') %}
 
    {% set header %}
    use database {{ target.database }};
    use schema {{ target_schema }};
    {%- endset -%}
-   {% do temp.append(header | string ) %}
+   {% do print(header | string ) %}
 
    {% if include_truncate == 'true' %}
    {% set template %}
@@ -43,11 +42,8 @@
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
-      {% do temp.append(template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME)) %}
+      {% do print(template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME)) %}
    {% endfor %}
 
-   {% set results = temp | join ('\n') %}
-   {{ log(results, info=True) }}
-   {% do return(results) %}
 {% endmacro %}
 --

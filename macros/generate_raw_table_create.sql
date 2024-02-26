@@ -6,11 +6,6 @@
     {% if version_name=='default' %}
         {% set version_name = var('dictionary_database_version', 'default') %}
     {% endif %}
-	
-{% set header %}
-use role load_role;
-{%- endset -%}
-   {% do print(header | string ) %}
 
    {% set task_template %}
 create or replace table raw.{{database_name}}.{@source_table_name} 

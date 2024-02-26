@@ -27,7 +27,7 @@ use role load_role;
 
 {%- set rowset = run_query(query) %}    
 {% for item in rowset %} 
-    {{ iv_common.generate_raw_tables_task(
+    {{ iv_common.generate_raw_table_task(
         database_name=database_name
         , version_name=version_name
         , table_name=item.SOURCE_TABLE_NAME

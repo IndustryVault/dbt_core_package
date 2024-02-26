@@ -23,7 +23,9 @@
 {%- set rowset = run_query(query) %}    
 {% for item in rowset %} 
     {{ iv_common.generate_raw_table_load(
-        table_name=item.SOURCE_TABLE_NAME
+	database_name=database_name
+	, version_name=version_name
+        , table_name=item.SOURCE_TABLE_NAME
     ) }}
 
 {% endfor %} 

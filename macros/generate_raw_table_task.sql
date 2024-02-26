@@ -63,7 +63,7 @@
 
          else IFF(startswith(stage_table_name,'demand'),'utf-16','iso-8859-1') END as encoding1
          , 'utf-16' as encoding
-         , listagg(CONCAT(stage_column_name,' ',stage_column_type,'\n'), ',') within group ( order by column_order) as column_list, import_file
+         , listagg(CONCAT(stage_column_name,' ',stage_column_type,'\n'), ',') within group ( order by column_order) as column_list
 	from {{ ref('data_dictionary') }}
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and source_table_name='{{table_name}}'
@@ -73,7 +73,7 @@
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
-      {% do temp.append(template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME)| replace('{@encoding}', tbl.ENCODING) | replace('{@column_list_with_type}', tbl.COLUMN_LIST)  | replace('{@lower_import_file}', tbl.IMPORT_FILE | lower) ) %}
+      {% do temp.append(template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME)| replace('{@encoding}', tbl.ENCODING) | replace('{@column_list_with_type}', tbl.COLUMN_LIST) | lower) ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

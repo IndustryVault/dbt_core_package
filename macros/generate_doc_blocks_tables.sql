@@ -1,4 +1,4 @@
-{% macro generate_doc_blocks_tables(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
+{% macro generate_doc_blocks_tables(database_name='default', version_name='default', table_name='ALL', is_source_or_stage='source') %}
 
 {% set header %}
 (* comment *)

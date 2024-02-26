@@ -34,8 +34,8 @@
 {% do print ('\tselect  ') %}
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
-		{%- if not loop.first %}{% do print(',') %}{% endif -%}
-        	{% do print('\t"' ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
+		{%- if not loop.first %}{% do print('\t,') -%}{%- endif -%}
+        	{%- do print('"' ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}
 	{% do print( '\n\tfrom {{ source("' ~ raw_database_name ~'","' ~ source_table ~ '") }}') %}

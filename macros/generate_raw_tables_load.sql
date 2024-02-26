@@ -1,5 +1,5 @@
 
-{% macro generate_from_dictionary_raw_tables_load (database_name='default', version_name='default') %}
+{% macro generate_from_dictionary_raw_tables_load (database_name='default', version_name='default', stage_url) %}
 
     {% if database_name=='default' %}
         {% set database_name = var('dictionary_database', target.database) %}
@@ -26,6 +26,7 @@
 	database_name=database_name
 	, version_name=version_name
         , table_name=item.SOURCE_TABLE_NAME
+	, stage_url=stage_url
     ) }}
 
 {% endfor %} 

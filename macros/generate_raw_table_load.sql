@@ -19,9 +19,6 @@
 
    copy into raw.{{database_name }}.{{table_name}} from @raw.{{ database_name }}.{{ database_name }}_{{table_name}}_stage;
    {%- endset -%}
-   {% do temp.append(header | string ) %}
+   {% do print(header | string ) %}
 
-   {% set results = temp | join ('\n') %}
-   {{ log(results, info=True) }}
-   {% do return(results) %}
 {% endmacro %}

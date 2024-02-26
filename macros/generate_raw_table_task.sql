@@ -64,7 +64,7 @@
          else IFF(startswith(stage_table_name,'demand'),'utf-16','iso-8859-1') END as encoding1
          , 'utf-16' as encoding
          , listagg(CONCAT(stage_column_name,' ',stage_column_type,'\n'), ',') within group ( order by column_order) as column_list, import_file
-	from internal.dictionary 
+	from {{ ref('data_dictionary') }}
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and source_table_name='{{table_name}}'
 	group by stage_table_name, source_table_name, import_file

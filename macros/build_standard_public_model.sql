@@ -1,4 +1,4 @@
-{% macro build_standard_public_model(model_name) -%}
+e{% macro build_standard_public_model(model_name) -%}
 
 {%- set query1 -%}
 	select  
@@ -34,7 +34,7 @@
 {% do print ('\tselect  ') %}
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
-		{%- if not loop.first %}{% do print('\t,') -%}{%- endif -%}
+		{%- if not loop.first %}{% do print('\t,') -%}{% else %}{% do print('\t') -%}{%- endif -%}
         	{%- do print('"' ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}

@@ -1,6 +1,13 @@
 
 {% macro generate_from_dictionary_raw_table_create (database_name='default', version_name='default', description_method='none', apply_filter='',add_lightdash=false) %}
 
+    {% if database_name=='default' %}
+        {% set database_name = var('dictionary_database', target.database) %}
+    {% endif %}
+    {% if version_name=='default' %}
+        {% set version_name = var('dictionary_database_version', 'default') %}
+    {% endif %}
+
 {%- set query -%}
 	
     select 

@@ -28,7 +28,7 @@
 	create or replace task {{ target.database }}_reference_{@stage_table_name}_truncate
 		ALLOW_OVERLAPPING_EXECUTION=FALSE
 		WAREHOUSE=INGESTION_WH
-		schedule='{{ var('reference_load_start') }}'
+		schedule='{{ var('dictionary_load_start') }}'
     AS 
       truncate table {{ target.database }}.reference.{@stage_table_name};
 

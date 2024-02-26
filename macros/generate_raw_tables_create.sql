@@ -8,6 +8,11 @@
         {% set version_name = var('dictionary_database_version', 'default') %}
     {% endif %}
 
+{% set header %}
+use role load_role;
+{%- endset -%}
+   {% do print(header | string ) %}
+
 {%- set query -%}
 	
     select 

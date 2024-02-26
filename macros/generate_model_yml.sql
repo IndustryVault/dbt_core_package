@@ -42,12 +42,12 @@ models:
     {% set ns = namespace(last_table_name = 'NOT SET') %}
     {% for col in rowset %}
         {% if ns.last_table_name != col.STAGE_TABLE_NAME | string %}
-            {% do print('  - name: ' ~ col.STAGE_TABLE_NAME | lower ) %}
+            {% do print('  - name: ' ~ col.STAGE_TABLE_NAME ) %}
 	        {% do print('    columns:') %}
             {% set ns.last_table_name = col.STAGE_TABLE_NAME | string %}
         {%endif %}
 
-        {% do print('      - name: ' ~ col.STAGE_COLUMN_NAME | lower) %}
+        {% do print('      - name: ' ~ col.STAGE_COLUMN_NAME) %}
 	{% if description_method == 'reference' %}
         {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
 	{% elif description_method == 'direct' %}

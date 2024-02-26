@@ -67,7 +67,7 @@
 	from {{ ref('data_dictionary') }}
 	where 
 		database_name='{{database_name}}' and version_name='{{version_name}}'  and source_table_name='{{table_name}}'
-	group by stage_table_name, source_table_name, import_file
+	group by stage_table_name, source_table_name
 	order by stage_table_name
    {%- endset -%}
    {%- set tables = run_query(query) -%}   

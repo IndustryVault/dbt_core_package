@@ -1,4 +1,4 @@
-{% macro generate_doc_blocks(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
+{% macro generate_doc_blocks(database_name='default', version_name='default', table_name='ALL', is_source_or_stage='source') %}
      {% if database_name=='default' %}
         {% set database_name = var('dictionary_database', target.database) %}
     {% endif %}

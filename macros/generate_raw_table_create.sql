@@ -31,7 +31,7 @@ create or replace table raw.{{database_name}}.{@source_table_name}
       {% if use_source %}
          {% set column_list = tbl.SOURCE_COLUMN_LIST %}
       {% endif %}
-      {% do print(task_template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@column_list_with_type}', column_list) ) %}
+      {% do print('\t' ~ task_template | string | replace('{@source_table_name}', tbl.SOURCE_TABLE_NAME) | replace('{@column_list_with_type}', column_list) ) %}
    {% endfor %}
 	    
 {% endmacro %}

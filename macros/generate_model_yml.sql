@@ -30,6 +30,7 @@ models:
 	    	when stage_column_type != 'string' then 1
                 else 0 
 		end is_metric
+	    , case when dd.stage_column_description is not null then 1 else 0 end has_description
             , IFF(stage_column_type in ('int','number(6,4)','number(20,2)'),1,0) as is_number_type
         from {{ref('data_dictionary')}} dd
         where 
@@ -48,10 +49,12 @@ models:
         {%endif %}
 
         {% do print('      - name: ' ~ col.STAGE_COLUMN_NAME) %}
+	{% if col.HAS_DESCRIPTION %}
 	{% if description_method == 'reference' %}
         {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.STAGE_TABLE_NAME ~ '_' ~ col.STAGE_COLUMN_NAME ~ '_stage_description' ~ '") }}\'' ) %}
 	{% elif description_method == 'direct' %}
         {% do print('        description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}  
+	{% endif %}
 	{% endif %}
 
         {% if add_lightdash %}

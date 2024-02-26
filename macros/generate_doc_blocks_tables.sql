@@ -1,5 +1,4 @@
 {% macro generate_doc_blocks_tables(database_name, version_name, table_name='ALL', is_source_or_stage='source') %}
-   {% set temp=[] %}
 
 {% set header %}
 (* comment *)
@@ -19,7 +18,7 @@ Not Provided
 (* enddocs *)
 {%- endset -%} 
    
-{%- do temp.append(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage)  | replace('(*', '{%') | replace('*)', '%}') ) -%}
+{%- do print(header | string | replace('{@doc_blockname}',  database_name ~ '_' ~ is_source_or_stage)  | replace('(*', '{%') | replace('*)', '%}') ) -%}
 
 {% set template %}
 (* docs {@doc_blockname}_description *)
@@ -42,7 +41,7 @@ Not Provided
    {%- set tables = run_query(query) -%}   
    
    {%- for tbl in tables -%}
-      {%- do temp.append(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('(*', '{%') | replace('*)', '%}') ) -%}
+      {%- do print(template | string | replace('{@doc_blockname}',  database_name ~ '_' ~ tbl.TABLE_NAME ~ '_' ~ is_source_or_stage) | replace('(*', '{%') | replace('*)', '%}') ) -%}
    {%- endfor -%}
 
      {% set footer %}
@@ -50,8 +49,6 @@ Not Provided
    [END GENERATION]
 (* endcomment *)
    {%- endset -%}
-   {% do temp.append(footer | string | replace('(*', '{%') | replace('*)', '%}') ) %}
-   {% set results = temp | join ('\n') %}
-   {{ log(results, info=True) }}
-   {% do return(results) %}
+   {% do print(footer | string | replace('(*', '{%') | replace('*)', '%}') ) %}
+
 {% endmacro %}

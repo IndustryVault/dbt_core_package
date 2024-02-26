@@ -73,7 +73,7 @@
    {%- set tables = run_query(query) -%}   
    
    {% for tbl in tables %}
-      {% do temp.append(template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME)| replace('{@encoding}', tbl.ENCODING) | replace('{@column_list_with_type}', tbl.COLUMN_LIST) | lower) ) %}
+      {% do temp.append(template | string | replace('{@stage_table_name}', tbl.STAGE_TABLE_NAME)| replace('{@encoding}', tbl.ENCODING) | replace('{@column_list_with_type}', tbl.COLUMN_LIST) | lower ) %}
    {% endfor %}
 
    {% set results = temp | join ('\n') %}

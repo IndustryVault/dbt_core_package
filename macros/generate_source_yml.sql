@@ -59,7 +59,7 @@ sources:
 	    order by source_table_name, column_order
    
     {% endset %}
-
+{% do print(query) %}
     {% set rowset=run_query(query) %}
 
    {% set ns = namespace(last_table_name = 'NOT SET') %}

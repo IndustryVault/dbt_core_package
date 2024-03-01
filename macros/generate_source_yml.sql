@@ -41,7 +41,10 @@ sources:
     tables:
 {%- endset -%}
 
-      {% set query %}
+   {% set header = header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') %}
+    {% do print (header) %}
+	
+	{% set query %}
     	select  
             source_table_name, stage_table_name, source_column_name, stage_column_description
             , stage_column_name, source_column_type, lower(stage_column_type) stage_column_type, allow_null
@@ -56,9 +59,8 @@ sources:
 	    order by source_table_name, column_order
    
     {% endset %}
-   {% set header = header | string | replace('(*', '{%') | replace('*)', '%}') | replace('[[', '{{') | replace(']]', '}}') %}
-    {% do print (header) %}
 
+	{% do print (query) %}
     {% set rowset=run_query(query) %}
 
    {% set ns = namespace(last_table_name = 'NOT SET') %}

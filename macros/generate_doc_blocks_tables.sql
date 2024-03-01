@@ -36,8 +36,8 @@ Not Provided
     {%- set query -%}
         select  distinct 
             CASE 
-                WHEN '{{is_source_or_stage}}'='source' then lower(source_table_name)
-                WHEN '{{is_source_or_stage}}'='stage' then lower(stage_table_name)
+                WHEN '{{is_source_or_stage}}'='source' then source_table_name
+                WHEN '{{is_source_or_stage}}'='stage' then stage_table_name
                 ELSE '****'
             end as table_name
         from internal.data_dictionary 

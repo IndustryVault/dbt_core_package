@@ -75,10 +75,12 @@ sources:
             {% else %}
                 {% do print('      - name: ' ~  col.TABLE_NAME ) %}
             {% endif %}
+		{% if col.HAS_DESCRIPTION %}
             {% if description_method == 'reference' %}
                     {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ col.SUFFIX ~ '") }}\'') %}  
             {% elif description_method == 'direct' %}
                 {% do print('        description: "Not Provided"' )  %}   
+            {% endif %}
             {% endif %}
             {% do print('        columns:') %}
             {% set ns.last_table_name = col.TABLE_NAME | string %}

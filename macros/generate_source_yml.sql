@@ -21,7 +21,7 @@
         {% set source_description = 'None Provided' %}
         {% set source_database = database_name %}
         {% set source_schema = 'public' %}
-	{% set apply_filter = ' and is_public=1 ' ~ apply_filter
+	{% set apply_filter = ' and is_public=1 ' ~ apply_filter %}
     {% endif %}
 
 {% set header %}

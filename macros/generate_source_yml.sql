@@ -52,6 +52,7 @@ sources:
             , CASE WHEN '{{is_external}}' = 'false' then source_column_name else stage_column_name end as column_name
             , CASE WHEN '{{is_external}}' = 'false' then source_column_type else stage_column_type end as column_type
             , CASE WHEN '{{is_external}}' = 'false' then '_source_description' else '_stage_description' end as suffix
+		    , case when stage_column_description is not null then 1 else 0 end has_description
 	from {{ ref('data_dictionary') }} 
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 

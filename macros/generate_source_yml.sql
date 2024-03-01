@@ -75,7 +75,7 @@ sources:
             {% else %}
                 {% do print('      - name: ' ~  col.TABLE_NAME ) %}
             {% endif %}
-		{% if col.HAS_DESCRIPTION %}
+	{% if col.HAS_DESCRIPTION %}
             {% if description_method == 'reference' %}
                     {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ col.SUFFIX ~ '") }}\'') %}  
             {% elif description_method == 'direct' %}
@@ -93,10 +93,12 @@ sources:
          {% endif %}
         {% do print('            data_type: ' ~ col.COLUMN_TYPE ) %}
         {% do print('            quote: true' ) %}
-        {% if description_method == 'reference' %}
+	{% if col.HAS_DESCRIPTION %}
+	{% if description_method == 'reference' %}
             {% do print('            description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ '_' ~ col.COLUMN_NAME ~ col.SUFFIX ~ '") }}\'') %}  
         {% elif description_method == 'direct' %}
             {% do print('            description: "' ~ col.STAGE_COLUMN_DESCRIPTION ~ '"' )  %}   
+        {% endif %}        
         {% endif %}        
         {% if col.ALLOW_NULL == false %}
             {% do sources_yaml.append('            tests: ' ) %}

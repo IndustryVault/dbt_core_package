@@ -60,7 +60,6 @@ sources:
    
     {% endset %}
 
-	{% do print (query) %}
     {% set rowset=run_query(query) %}
 
    {% set ns = namespace(last_table_name = 'NOT SET') %}

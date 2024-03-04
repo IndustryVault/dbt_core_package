@@ -19,7 +19,7 @@
     {% else %}
         {% set source_name = database_name | lower %}
         {% set source_description = 'None Provided' %}
-        {% set source_database = database_name %}
+        {% set source_database = "{{ '" ~ database_name ~ " if target.name == 'prod' else  env_var('DBT_SNOWFLAKE_DEV_PREFIX') '" ~ database_name ~ "' }}" %}
         {% set source_schema = 'public' %}
 	{% set apply_filter = ' and is_public ' ~ apply_filter %}
     {% endif %}

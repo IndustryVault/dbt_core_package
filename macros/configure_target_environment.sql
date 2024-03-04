@@ -32,6 +32,7 @@ use role sysadmin;
     grant usage on database raw to role transform_role;
     grant usage on schema raw.{{var('dictionary_database')}} to role transform_role;
     grant select on all tables in schema raw.{{var('dictionary_database')}} to role transform_role;
+    grant select on future tables in schema raw.{{var('dictionary_database')}} to role transform_role;
     grant usage on schema raw.internal to role transform_role;
     grant select on all tables in schema raw.internal to role transform_role;
 {% endif %}

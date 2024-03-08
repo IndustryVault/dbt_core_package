@@ -34,7 +34,7 @@ e{% macro build_standard_public_model(model_name) -%}
 {% do print ('\tselect  ') %}
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
-		{%- if not loop.first -%}{%- set prefix = '\t,' -%}{%- else -%}{% set prefix = '\t' -%}{%- endif -%}
+		{%- if not loop.first -%}{%- set prefix = '\t\t,' -%}{%- else -%}{% set prefix = '\t\t' -%}{%- endif -%}
         	{%- do print(prefix ~ '"' ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}

@@ -35,7 +35,7 @@ e{% macro build_standard_public_model(model_name) -%}
         {%- set columns = run_query(query) %}    
         {% for column in columns %}
 		{%- if not loop.first -%}{%- set prefix = '\t,' -%}{%- else -%}{% set prefix = '\t' -%}{%- endif -%}
-        	{%- do print('"' ~ prefix ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
+        	{%- do print(prefix ~ '"' ~ column.SOURCE_COLUMN_NAME ~ '"::' ~ column.STAGE_COLUMN_TYPE ~ ' AS ' ~ column.STAGE_COLUMN_NAME) %}
         {% endfor %}
 {% if execute %}
 	{% do print( '\n\tfrom {{ source("' ~ raw_database_name ~'","' ~ source_table ~ '") }}') %}

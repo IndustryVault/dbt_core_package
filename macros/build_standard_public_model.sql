@@ -28,7 +28,7 @@ e{% macro build_standard_public_model(model_name) -%}
 
 {%- set query -%}
 	select  
-		stage_column_name, stage_column_type, source_column_name, primary_key_list
+		stage_column_name, stage_column_type, source_column_name
 	from {{ ref('data_dictionary') }}
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 

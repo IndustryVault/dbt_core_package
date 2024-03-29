@@ -50,10 +50,12 @@ e{% macro build_standard_public_model(model_name) -%}
 {% endif %}
 
 {% do print(')\n\nselect \n\t *\nfrom filtered') %}
-{% if primary_key_list != '' %}
-{% do print('{% if var(\'enable_force_uniqueness\') == \'true\' %}') %}
-{% do print('qualify row_number() over (partition by ' ~ primary_key_list ~' order by null) = 1') %}
-{% do print('{% endif %}') %}
+{% if execute %}
+	{% if primary_key_list != '' %}
+		{% do print('{% if var(\'enable_force_uniqueness\') == \'true\' %}') %}
+		{% do print('qualify row_number() over (partition by ' ~ primary_key_list ~' order by null) = 1') %}
+		{% do print('{% endif %}') %}
+	{% endif %}
 {% endif %}
 
 {%- endmacro %}

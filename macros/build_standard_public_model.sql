@@ -5,7 +5,7 @@ e{% macro build_standard_public_model(model_name) -%}
 		distinct database_name, source_table_name, a.stage_table_name, primary_key_list
 	from {{ ref('data_dictionary') }} a
 	inner join (
-		Select stage_table_name, listagg(stage_column_name) within group (order by primary_key_order asc) primary_key_list 
+		Select stage_table_name, listagg(stage_column_name,',') within group (order by primary_key_order asc) primary_key_list 
 		from {{ ref('data_dictionary') }} 
 		where primary_key_order is not null 
 		group by stage_table_name

@@ -2,8 +2,14 @@ e{% macro build_standard_public_model(model_name) -%}
 
 {%- set query1 -%}
 	select  
-		distinct database_name, source_table_name, stage_table_name
+		distinct database_name, source_table_name, stage_table_name, primary_key_list
 	from {{ ref('data_dictionary') }}
+	inner join (
+		Select stage_table_name, listagg(stage_column_name) within group (order by primary_key_order asc) primary_key_list 
+		from {{ ref('data_dictionary') }} 
+		where primary_key_order is not null 
+		group by stage_table_name
+	)
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
 		and stage_table_name='{{model_name}}' 
@@ -13,14 +19,16 @@ e{% macro build_standard_public_model(model_name) -%}
 
 {% if execute %}
     {%- set raw_database_name  = 'raw__' ~ run_query(query1)[0][0] %}  
-    {%- set source_table = run_query(query1)[0][1] %}  
+    {%- set source_table = run_query(query1)[0][1] %}
+    {%- set primary_key_list = run_query(query1)[0][3] %}  
 {% else %}
     {%- set source_table = '' %}  
+{   {%- set primary_key_list = '' %}  
 {% endif %}
 
 {%- set query -%}
 	select  
-		stage_column_name, stage_column_type, source_column_name  
+		stage_column_name, stage_column_type, source_column_name, primary_key_list
 	from {{ ref('data_dictionary') }}
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
@@ -42,8 +50,10 @@ e{% macro build_standard_public_model(model_name) -%}
 {% endif %}
 
 {% do print(')\n\nselect \n\t *\nfrom filtered') %}
+{% if primary_key_list != '' %}
 {% do print('{% if var(\'enable_force_uniqueness\') == \'true\' %}') %}
-{% do print('qualify row_number() over (partition by ' ~ 'AccountNumber,BusinessDate' ~' order by null) = 1') %}
+{% do print('qualify row_number() over (partition by ' ~ primary_key_list ~' order by null) = 1') %}
 {% do print('{% endif %}') %}
+{% endif %}
 
 {%- endmacro %}

@@ -23,7 +23,7 @@ e{% macro build_standard_public_model(model_name) -%}
     {%- set primary_key_list = run_query(query1)[0][3] %}  
 {% else %}
     {%- set source_table = '' %}  
-{   {%- set primary_key_list = '' %}  
+    {%- set primary_key_list = '' %}  
 {% endif %}
 
 {%- set query -%}

@@ -43,6 +43,7 @@ e{% macro build_standard_public_model(model_name) -%}
 
 {% do print(')\n\nselect \n\t *\nfrom filtered') %}
 {% do print('{% if var(\'enable_force_uniqueness\') == \'true\' %}') %}
-{% do print('qualify row_number() over (partition by AccountNumber,BusinessDate order by null) = 1') %}
+{% do print('qualify row_number() over (partition by ' ~ 'AccountNumber,BusinessDate' ~' order by null) = 1') %}
+{% do print('{% endif %}') %}
 
 {%- endmacro %}

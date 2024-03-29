@@ -12,8 +12,8 @@ e{% macro build_standard_public_model(model_name) -%}
 	) b on a.stage_table_name=b.stage_table_name
 	where 
 		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-		and stage_table_name='{{model_name}}' 
-		and stage_column_name is not null
+		and a.stage_table_name='{{model_name}}' 
+		and a.stage_column_name is not null
         and is_public = 1
 {%- endset -%}
 

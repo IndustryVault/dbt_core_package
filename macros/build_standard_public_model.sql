@@ -1,4 +1,4 @@
-e{% macro build_standard_public_model(model_name) -%}
+{% macro build_standard_public_model(model_name) -%}
 
 {%- set query1 -%}
 	select  

@@ -14,12 +14,6 @@ use role sysadmin;
     grant select on future tables in schema raw.{{var('dictionary_database')}} to role develop_role;
     grant usage on schema raw.internal to role develop_role;
     grant select on all tables in schema raw.internal to role develop_role;
-   
-    create schema if not exists raw.sigma_upload;
-    grant usage on database raw to role report_role;
-
-    grant usage on schema raw.sigma_upload to role report_role;
-    grant all on schema raw.sigma_upload to role report_role;
     
     use role securityadmin;
     grant create schema on database raw to role load_role;

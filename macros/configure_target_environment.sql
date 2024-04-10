@@ -38,6 +38,7 @@ use role sysadmin;
     grant select on all tables in schema raw.internal to role transform_role;
 {% endif %}
 
+use role sysadmin;
 -- developer profile should point to a uniquely named version of the production database like dbt_[developer name]_[database_name]
 create database if not exists {{target.database}};  -- create developer database
 create database if not exists {{var('dictionary_database')}}; -- create production database

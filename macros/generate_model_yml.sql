@@ -36,7 +36,7 @@ models:
         where 
             dd.database_name='{{database_name}}' and dd.version_name='{{version_name}}' and dd.is_public
             {{ apply_filter }}
-	    order by dd.stage_table_name, dd.column_order
+	    order by dd.stage_table_name, dd.stage_column_name
     {% endset %}
     {% set rowset=run_query(query) %}
 

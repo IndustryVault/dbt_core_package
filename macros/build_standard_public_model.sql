@@ -7,7 +7,7 @@
 	left join (
 		Select stage_table_name, listagg(stage_column_name,',') within group (order by primary_key_order asc) as primary_key_list 
 		from {{ ref('data_dictionary') }} 
-		where primary_key_order is not null 
+		where primary_key_order is not null and stage_table_name='{{model_name}}' 
 		group by stage_table_name
 	) b on a.stage_table_name=b.stage_table_name
 	where 

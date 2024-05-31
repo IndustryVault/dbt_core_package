@@ -1,5 +1,6 @@
   {{ config(materialized='view', sort='the_date', schema='internal') }}
   
+  
   WITH generate_dates AS (
     SELECT DATEADD(DAY, SEQ4(), '12/31/1980' ) AS the_date
       FROM TABLE(GENERATOR(ROWCOUNT=>10000 ))  -- Number of days after reference date in previous line
@@ -9,7 +10,6 @@
         ,MONTH(the_date)::SMALLINT AS month
         ,MONTHNAME(the_date)::VARCHAR(3) AS month_abbreviation
         ,TO_CHAR(the_date,'MMMM') as month_name
-        ,DAY(the_date)::SMALLINT as day_in_month
         ,DAYOFWEEK(the_date) as day_in_week  
         ,CASE WHEN day_in_week=0 OR day_in_week=6 Then True else False End is_weekend
         ,(NOT is_weekend) is_business_day

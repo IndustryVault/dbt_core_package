@@ -28,12 +28,11 @@
         ,datediff('day',the_date, last_day_in_year) days_remaining_in_year
         ,datediff('day',first_day_in_year, last_day_in_year) days_in_year
         ,LAST_DAY(the_date,'week')::date as last_day_in_week
-        ,LAST_DAY(the_date,'year')::date as last_day_in_year
         ,quarter(the_date) as quarter
         ,['First','Second','Third','Fourth'][quarter-1]::varchar quarter_abbreviation
         ,concat(quarter_abbreviation,' Quarter') quarter_name_full
-        ,to_varchar(the_date, 'yyyymmdd') date_yyyymmdd        
-        ,to_varchar(the_date, 'yyyy-mm-dd') date_yyyy_mm_dd
-        ,to_varchar(the_date, 'dd-mon-yyyy') date_dd_mon_yyyy
-        ,to_varchar(the_date, 'mm/dd/yyyy') date_mm_dd_yyyy
+        ,to_varchar(the_date, 'yyyymmdd') format_yyyymmdd        
+        ,to_varchar(the_date, 'yyyy-mm-dd') format_yyyy_mm_dd
+        ,to_varchar(the_date, 'dd-mon-yyyy') format_dd_mon_yyyy
+        ,to_varchar(the_date, 'mm/dd/yyyy') format_mm_dd_yyyy
     FROM generate_dates

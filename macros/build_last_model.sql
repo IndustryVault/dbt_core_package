@@ -27,6 +27,6 @@
 {% endif %}
 
 {% do print ('Select a.* from {{ source("loanserv_static", ' ~ model_name ~ ') }} a') %}
-{% do print ('qualify row_number() over (partition by ' ~ primary_key ~ ' order by ' ~ primary_key_list | replace(primary_key + ',', '') ~ ') = 1') %}
+{% do print ('qualify row_number() over (partition by ' ~ primary_key ~ ' order by ' ~ primary_key_list | replace(primary_key + ',', '') ~ ' desc) = 1') %}
 
 {%- endmacro %}

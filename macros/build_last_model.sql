@@ -3,18 +3,7 @@
 {%- set query1 -%}
 	select  
 		distinct database_name, source_table_name, a.stage_table_name, IFNULL(b.primary_key_list,'') primary_list, 
-	from {{ ref('data_dictionary') }} a
-	left join (
-		Select stage_table_name, listagg(stage_column_name,',') within group (order by primary_key_order asc) as primary_key_list 
-		from {{ ref('data_dictionary') }} 
-		where primary_key_order is not null and stage_table_name='{{model_name}}' 
-		group by stage_table_name
-	) b on a.stage_table_name=b.stage_table_name
-	where 
-		database_name='{{ var('dictionary_database') }}' and version_name='{{ var('dictionary_database_version') }}' 
-		and a.stage_table_name='{{model_name}}' 
-		and a.stage_column_name is not null
-        and is_public = 1
+	from {{ ref('primary_keys') }} a
 {%- endset -%}
 
 {% if execute %}

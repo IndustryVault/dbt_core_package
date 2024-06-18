@@ -26,7 +26,7 @@
     {%- set primary_key_list = '' %}  
 {% endif %}
 
-{% do print 'Select a.* from {{ source("loanserv_static", ' ~ model_name ~ ') }} a' %}
-{% do print 'qualify row_number() over (partition by ' ~ primary_key ~ ' order by ' ~ primary_key_list ~ ') = 1' %}
+{% do print ('Select a.* from {{ source("loanserv_static", ' ~ model_name ~ ') }} a') %}
+{% do print ('qualify row_number() over (partition by ' ~ primary_key ~ ' order by ' ~ primary_key_list ~ ') = 1') %}
 
 {%- endmacro %}

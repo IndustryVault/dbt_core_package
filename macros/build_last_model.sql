@@ -2,8 +2,8 @@
 
 {%- set query1 -%}
 	select  
-		distinct IFNULL(b.primary_key_list,'') primary_list, 
-	from {{ ref('primary_keys') }} a
+		distinct IFNULL(primary_key_list,'') primary_list, 
+	from {{ ref('primary_keys') }}
 	where stage_table_name='{{model_name}}'
 {%- endset -%}
 

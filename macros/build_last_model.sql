@@ -2,16 +2,14 @@
 
 {%- set query1 -%}
 	select  
-		distinct database_name, source_table_name, a.stage_table_name, IFNULL(b.primary_key_list,'') primary_list, 
+		distinct IFNULL(b.primary_key_list,'') primary_list, 
 	from {{ ref('primary_keys') }} a
+	where stage_table_name='{{model_name}}'
 {%- endset -%}
 
 {% if execute %}
-    {%- set raw_database_name  = 'raw__' ~ run_query(query1)[0][0] %}  
-    {%- set source_table = run_query(query1)[0][1] %}
-    {%- set primary_key_list = run_query(query1)[0][3] %}  
+    {%- set primary_key_list = run_query(query1)[0][0] %}  
 {% else %}
-    {%- set source_table = '' %}  
     {%- set primary_key_list = '' %}  
 {% endif %}
 

@@ -82,13 +82,13 @@ sources:
         {% if not ns.last_table_name  == current_table_name %}
           {% set joined = sources_yaml | join ('\n') %}
           {% set sources_yaml=[] %}
-	        {% if is_external == 'false' %}
+	    {% if is_external == 'false' %}
                 {% do print('      - name: "' ~  col.TABLE_NAME ~ '"') %}
-			{% if col.VALID_VALUE_NAME != 'NONE' %}
-			  	{% do print('      - name: "' ~  col.TABLE_NAME ~ 'Text"') %}
-			{% endif %}
             {% else %}
                 {% do print('      - name: ' ~  col.TABLE_NAME ) %}
+		{% if col.VALID_VALUE_NAME != 'NONE' %}
+			{% do print('      - name: "' ~  col.TABLE_NAME ~ 'Text"') %}
+		{% endif %}
             {% endif %}
 	{% if col.HAS_DESCRIPTION %}
             {% if description_method == 'reference' %}

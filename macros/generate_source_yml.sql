@@ -103,7 +103,7 @@ sources:
         {% else %}
 			{% if col.VALID_VALUE_NAME != 'NONE' %}
 				{% do print('          - name: ' ~  col.COLUMN_NAME ~ 'Text') %}
-				{% do print('          - data_type: Text') %}
+				{% do print('            data_type: Text') %}
 			{% endif %}   
             {% do print('          - name: ' ~ col.COLUMN_NAME ) %}      
 		{% endif %}

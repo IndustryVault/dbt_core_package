@@ -75,24 +75,25 @@ sources:
 
     {% set rowset=run_query(query) %}
 
-   {% set ns = namespace(last_table_name = 'NOT SET') %}
-       {% set sources_yaml=[] %}
+   	{% set ns = namespace(last_table_name = 'NOT SET') %}
+    {% set sources_yaml=[] %}
     {% for col in rowset %}
         {% set current_table_name = col.TABLE_NAME | string %}      
         {% if not ns.last_table_name  == current_table_name %}
-          {% set joined = sources_yaml | join ('\n') %}
-          {% set sources_yaml=[] %}
-	    {% if is_external == 'false' %}
+          	{% set joined = sources_yaml | join ('\n') %}
+          	{% set sources_yaml=[] %}
+			{% if is_external == 'false' %}
                 {% do print('      - name: "' ~  col.TABLE_NAME ~ '"') %}
             {% else %}
+				{% if col.VALID_VALUE_NAME != 'NONE' %}
+					{% do print('      - name: ' ~  col.TABLE_NAME ~ 'Text') %}
+					{% do print('      - data_type: Text') %}
+				{% endif %}   
                 {% do print('      - name: ' ~  col.TABLE_NAME ) %}
-		{% if col.VALID_VALUE_NAME != 'NONE' %}
-			{% do print('      - name: "' ~  col.TABLE_NAME ~ 'Text"') %}
-		{% endif %}
             {% endif %}
 	{% if col.HAS_DESCRIPTION %}
             {% if description_method == 'reference' %}
-                    {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ col.SUFFIX ~ '") }}\'') %}  
+                {% do print('        description: \'{{ doc("' ~ database_name ~ '_' ~ col.TABLE_NAME ~ col.SUFFIX ~ '") }}\'') %}  
             {% elif description_method == 'direct' %}
                 {% do print('        description: "Not Provided"' )  %}   
             {% endif %}
@@ -104,10 +105,12 @@ sources:
   	     {% if is_external == 'false' %}
             {% do print('          - name: "' ~ col.COLUMN_NAME ~ '"') %}
          {% else %}
-            {% do print('          - name: ' ~ col.COLUMN_NAME ) %}
-		{% if col.VALID_VALUE_NAME != 'NONE' %}
-			{% do print('      - name: "' ~  col.TABLE_NAME ~ 'Text"') %}
-		{% endif %}         {% endif %}
+			{% if col.VALID_VALUE_NAME != 'NONE' %}
+				{% do print('      - name: ' ~  col.TABLE_NAME ~ 'Text') %}
+				{% do print('      - data_type: Text') %}
+			{% endif %}   
+            {% do print('          - name: ' ~ col.COLUMN_NAME ) %}      
+		{% endif %}
         {% do print('            data_type: ' ~ col.COLUMN_TYPE ) %}
         {% do print('            quote: true' ) %}
 	{% if col.HAS_DESCRIPTION %}

@@ -46,14 +46,26 @@ sources:
 	
 	{% set query %}
     	select  
-            source_table_name, stage_table_name, source_column_name, stage_column_description
-            , stage_column_name, source_column_type, lower(stage_column_type) stage_column_type, allow_null
-            , CASE WHEN '{{is_external}}' = 'false' then source_table_name else stage_table_name end as table_name
-            , CASE WHEN '{{is_external}}' = 'false' then source_column_name else stage_column_name end as column_name
-            , CASE WHEN '{{is_external}}' = 'false' then source_column_type else stage_column_type end as column_type
-            , CASE WHEN '{{is_external}}' = 'false' then '_source_description' else '_stage_description' end as suffix
-		    , case when stage_column_description is not null then 1 else 0 end has_description
-	from {{ ref('data_dictionary') }} 
+			source_table_name, stage_table_name, source_column_name, stage_column_description
+			, stage_column_name, source_column_type, lower(stage_column_type) stage_column_type, allow_null
+			, CASE WHEN '{{is_external}}' = 'false' then source_table_name else stage_table_name end as table_name
+			, CASE WHEN '{{is_external}}' = 'false' then source_column_name else stage_column_name end as column_name
+			, CASE WHEN '{{is_external}}' = 'false' then source_column_type else stage_column_type end as column_type
+			, CASE WHEN '{{is_external}}' = 'false' then '_source_description' else '_stage_description' end as suffix
+			, CASE WHEN stage_column_description is not null then 1 else 0 end has_description
+			, case when vv.pfid is not null then source_column_name else 'NONE' end as valid_value_name
+	from {{ ref('data_dictionary') }} dd
+	left outer join (
+		Select pfid, code_type
+		from {{ ref('valid_values') }} 
+		where code_type='Code'  and pfid not in 
+		(
+			Select pfid from (
+				Select pfid, code_type From  {{ ref('valid_values') }} group by pfid, code_type
+			) group by pfid having count(*) > 1
+		) 
+		group by pfid, code_type
+	) vv on dd.pfid=vv.pfid
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 
             {{ apply_filter }}
@@ -72,6 +84,9 @@ sources:
           {% set sources_yaml=[] %}
 	        {% if is_external == 'false' %}
                 {% do print('      - name: "' ~  col.TABLE_NAME ~ '"') %}
+			{% if col.VALID_VALUE_NAME != 'NONE' %}
+			  	{% do print('      - name: "' ~  col.TABLE_NAME ~ 'Text"') %}
+			{% endif %}
             {% else %}
                 {% do print('      - name: ' ~  col.TABLE_NAME ) %}
             {% endif %}

@@ -69,7 +69,7 @@ sources:
         where 
             database_name='{{database_name}}' and version_name='{{version_name}}' 
             {{ apply_filter }}
-	    order by source_table_name, column_order
+	    order by source_table_name, column_order, stage_column_name
    
     {% endset %}
 
@@ -105,7 +105,9 @@ sources:
             {% do print('          - name: "' ~ col.COLUMN_NAME ~ '"') %}
          {% else %}
             {% do print('          - name: ' ~ col.COLUMN_NAME ) %}
-         {% endif %}
+		{% if col.VALID_VALUE_NAME != 'NONE' %}
+			{% do print('      - name: "' ~  col.TABLE_NAME ~ 'Text"') %}
+		{% endif %}         {% endif %}
         {% do print('            data_type: ' ~ col.COLUMN_TYPE ) %}
         {% do print('            quote: true' ) %}
 	{% if col.HAS_DESCRIPTION %}

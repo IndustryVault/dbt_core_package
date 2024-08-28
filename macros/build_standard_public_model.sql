@@ -18,7 +18,7 @@
 {%- endset -%}
 
 {% if execute %}
-    {%- set raw_database_name  = 'raw__' ~ run_query(query1)[0][0] | lower() %}  
+    {%- set raw_database_name  = 'raw__' ~ run_query(query1)[0][0] | lower %}  
     {%- set source_table = run_query(query1)[0][1] %}
     {%- set primary_key_list = run_query(query1)[0][3] %}  
 {% else %}

@@ -1,4 +1,4 @@
-  {{ config(materialized='view', sort='the_date', schema='internal') }}
+  {{ config(materialized='table', sort='the_date', schema='public') }}
   
   
   WITH generate_dates AS (

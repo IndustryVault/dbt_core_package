@@ -3,7 +3,7 @@
   
   WITH generate_dates AS (
     SELECT DATEADD(DAY, SEQ4(), '12/31/1980' ) AS the_date
-      FROM TABLE(GENERATOR(ROWCOUNT=>20000 ))  -- Number of days after reference date in previous line
+      FROM TABLE(GENERATOR(ROWCOUNT=>50000 ))  -- Number of days after reference date in previous line
   )
   SELECT the_date
         ,YEAR(the_date)::SMALLINT as year

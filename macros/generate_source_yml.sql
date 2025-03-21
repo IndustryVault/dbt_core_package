@@ -15,7 +15,7 @@
     		{% set source_description = 'Not Provided'  %}
         {% endif %}
         {% set source_database = 'raw' %}
-        {% set source_schema = database_name %}
+        {% set source_schema = var('raw_schema') %}
     {% else %}
         {% set source_name = database_name | lower %}
         {% set source_description = 'None Provided' %}

@@ -17,6 +17,7 @@ a set of macros that will generate scaffolding for a DBT based a comma separate 
 * stage_column_description - the description of the column
 * stage_column_type - the type information for a column
 * allow_null - whether the source data allows null values in this column
+* raw_schema - a variable set in every project which refers to the table name in raw you want to derive the data_dictionary from
 
 To use this set of macros you first must create a dictionary (the model is referenced by ```{{ref('data_dictionary')}}```) that meets the above requirements. You may, of course, have additional information in your dictionary but the above fields are directly referenced by the macros so they must be present.  
 

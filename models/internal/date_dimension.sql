@@ -131,5 +131,3 @@ ASOF JOIN operation_dates MATCH_CONDITION ( cal.the_date <= operation_dates.The_
 JOIN operation_days_remaining_in_month omonth on cal.the_date=omonth.the_date  
 JOIN operation_days_remaining_in_quarter oquarter on cal.the_date=oquarter.the_date
 JOIN operation_days_remaining_in_year oyear on cal.the_date=oyear.the_date
-where cal.the_date >= '2026-01-01' 
-order by cal.the_date asc;

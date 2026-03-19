@@ -6,6 +6,8 @@
   , schema='public'
 ) }}
 
+-- depends_on: {{ ref('date_dimension_production_dates') }}
+
 {% set join_table_exists = table_exists(database=this.database, schema=this.schema, identifier='date_dimension_production_dates') %}
 
 WITH generate_dates AS (

@@ -5,7 +5,6 @@
   , schema='public'
 ) }}
 
-;
 use role sysadmin;
 create or replace table cmg_master.public.date_dimension
 as 

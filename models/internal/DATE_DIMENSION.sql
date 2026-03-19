@@ -97,8 +97,8 @@ SELECT cal.the_date
       ,TO_CHAR(cal.the_date,'MMMM') as month_name
       ,dayname(cal.the_date)::varchar(50) as day_in_week_abbreviation
       ,['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][day_in_week]::varchar day_of_week_full
-      , is_weekend
-      , is_business_day
+      , cal.is_weekend
+      , cal.is_business_day
       ,WEEK(cal.the_date)::SMALLINT as week_in_year
       ,DAYOFYEAR(cal.the_date)::SMALLINT as day_in_year
       ,DAYOFMONTH(cal.the_date)::SMALLINT as day_in_month

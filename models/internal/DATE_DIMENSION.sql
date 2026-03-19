@@ -28,7 +28,7 @@ WITH generate_dates AS (
         ,LEAD(THE_DATE,20) OVER(ORDER BY THE_DATE ASC) plus20_business_days
         ,LEAD(THE_DATE,30) OVER(ORDER BY THE_DATE ASC) plus30_business_days
     FROM generate_dates 
-    WHERE IS_BUSINESS_DAY and the_date not in (Select holiday_date from cmg_master.public.holidays)
+    WHERE IS_BUSINESS_DAY and the_date not in (Select holiday_date from {{ref('date_dimension_holidays') }})
 )
 , business_days_remaining_in_month as
 (
@@ -64,7 +64,7 @@ WITH generate_dates AS (
         ,LEAD(THE_DATE,20) OVER(ORDER BY THE_DATE ASC) plus20_operation_days
         ,LEAD(THE_DATE,30) OVER(ORDER BY THE_DATE ASC) plus30_operation_days
     FROM generate_dates 
-    WHERE IS_operation_DAY and the_date not in (Select holiday_date from cmg_master.public.holidays)
+    WHERE IS_operation_DAY and the_date not in (Select holiday_date from {{ref('date_dimension_holidays') }})
 )
 , operation_days_remaining_in_month as
 (

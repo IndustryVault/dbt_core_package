@@ -24,5 +24,6 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "dbt_packages"
 
 seeds:
-  iv_common:
-    +schema: internal
+  - name: date_dimension_holidays
+    config:
+      schema: internal

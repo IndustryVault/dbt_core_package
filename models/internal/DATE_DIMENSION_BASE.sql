@@ -6,6 +6,8 @@
   , schema='public'
 ) }}
 
+{% set join_table_exists = table_exists(database=this.database, schema=this.schema, identifier='date_dimension_production_dates') %}
+
 WITH generate_dates AS (
   SELECT DATEADD(DAY, SEQ4(), DATEADD(DAY,-15000, current_date()) ) AS the_date
         ,DAYOFWEEK(the_date) as day_in_week
@@ -129,6 +131,12 @@ SELECT cal.the_date
       ,omonth.day_count as operation_days_remaining_in_month
       ,oquarter.day_count as operation_days_remaining_in_quarter
       ,oyear.day_count as operation_days_remaining_in_year
+{% if join_table_exists %}
+      , (prod.the_date is not null) is_production_date
+{% else %}
+      , false is_production_date
+{% endif %}
+  
 FROM generate_dates cal
 ASOF JOIN business_dates MATCH_CONDITION ( cal.the_date <= business_dates.The_date )
 JOIN business_days_remaining_in_month bmonth on cal.the_date=bmonth.the_date  
@@ -138,6 +146,10 @@ ASOF JOIN operation_dates MATCH_CONDITION ( cal.the_date <= operation_dates.The_
 JOIN operation_days_remaining_in_month omonth on cal.the_date=omonth.the_date  
 JOIN operation_days_remaining_in_quarter oquarter on cal.the_date=oquarter.the_date
 JOIN operation_days_remaining_in_year oyear on cal.the_date=oyear.the_date
+{% if join_table_exists %}
+LEFT JOIN
+    {{ ref('date_dimension_production_dates') }} AS prod ON prod.the_date = cal.the_date
+{% endif %}
 {% if is_incremental() %}
     WHERE 0=1
 {% endif %}

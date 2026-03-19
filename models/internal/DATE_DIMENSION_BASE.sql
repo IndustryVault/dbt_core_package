@@ -5,9 +5,6 @@
   , schema='public'
 ) }}
 
-use role sysadmin;
-create or replace table cmg_master.public.date_dimension
-as 
 WITH generate_dates AS (
   SELECT DATEADD(DAY, SEQ4(), DATEADD(DAY,-15000, current_date()) ) AS the_date
         ,DAYOFWEEK(the_date) as day_in_week

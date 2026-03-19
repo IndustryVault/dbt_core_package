@@ -119,12 +119,12 @@ SELECT cal.the_date
       ,to_varchar(cal.the_date, 'yyyy-mm-dd') format_yyyy_mm_dd
       ,to_varchar(cal.the_date, 'dd-mon-yyyy') format_dd_mon_yyyy
       ,to_varchar(cal.the_date, 'mm/dd/yyyy') format_mm_dd_yyyy
-      ,plus3_business_days as BUSINESSDATE03
-      ,plus5_business_days as BUSINESSDATE05
-      ,plus10_business_days as BUSINESSDATE10
-      ,plus15_business_days as  BUSINESSDATE15
-      ,plus20_business_days as BUSINESSDATE20
-      ,plus30_business_days as BUSINESSDATE30
+      ,business_dates.plus3_business_days as BUSINESSDATE03
+      ,business_dates.plus5_business_days as BUSINESSDATE05
+      ,business_dates.plus10_business_days as BUSINESSDATE10
+      ,business_dates.plus15_business_days as  BUSINESSDATE15
+      ,business_dates.plus20_business_days as BUSINESSDATE20
+      ,business_dates.plus30_business_days as BUSINESSDATE30
       , business_dates.* exclude (the_date)
       , operation_dates.* exclude (the_date)
       ,bmonth.day_count as business_days_remaining_in_month

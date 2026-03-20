@@ -95,6 +95,7 @@ SELECT cal.the_date
       ,MONTH(cal.the_date)::SMALLINT AS month
       ,MONTHNAME(cal.the_date)::VARCHAR(3) AS month_abbreviation
       ,TO_CHAR(cal.the_date,'MMMM') as month_name
+      , day_in_week
       ,dayname(cal.the_date)::varchar(50) as day_in_week_abbreviation
       ,['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][day_in_week]::varchar day_of_week_full
       , cal.is_weekend

@@ -1,0 +1,13 @@
+version: 2
+
+data_tests:
+
+  - name: ensure_edw_shares_exist
+    config:
+      severity: "error"
+      enabled: true
+      tags: 
+        - ensures
+        
+    description: >
+      Validates that the shares to the edw database exist in the servicervault database. This is a sanity check to ensure that the shares are being created and maintained correctly.

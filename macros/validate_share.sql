@@ -1,6 +1,7 @@
-{% macro validate_share(share_name, db_name, exclude_schemas=['INFORMATION_SCHEMA','ARTIFACTS']) %}
+{% macro validate_share(db_name, exclude_schemas=['INFORMATION_SCHEMA','ARTIFACTS']) %}
   {% if execute %}
 
+    {% set share_name = 'sdw_' ~ db_name %}    
     {% set excl = "'" ~ exclude_schemas | join("','") ~ "'" %}
 
     {# 1. objects that SHOULD be shared, across ALL schemas: tables + secure views #}

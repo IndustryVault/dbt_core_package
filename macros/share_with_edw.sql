@@ -20,6 +20,6 @@
             grant select on view {{ v.DATABASE }}.{{ v.SCHEMA }}.{{ v.VIEW }} to share SDW_{{ v.DATABASE }};
         {%- endfor -%}
 
-        {% do log(" - Sharing schema: " ~ schema ~ ")", info=True) %}
+        {% do log(" - Sharing schema: " ~ schema, info=True) %}
     {% endfor %}
 {% endmacro %}

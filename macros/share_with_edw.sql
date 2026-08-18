@@ -4,7 +4,7 @@
         {{ return('') }}
     {% endif %}
 
-    {% for schema in schemas %}
+    {% for schema in schemas if schema | upper not in ['ARTIFACTS'] %}
         grant usage on database {{ target.database }} to share SDW_{{ target.database }};
         grant usage on schema {{ target.database }}.{{ schema }} to share SDW_{{target.database}};
         grant select on all tables in schema {{ target.database }}.{{ schema }} to share SDW_{{ target.database }};

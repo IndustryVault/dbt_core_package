@@ -5,7 +5,7 @@ data_tests:
   - name: ensure_edw_shares_exist
     config:
       severity: "error"
-      enabled: false
+      enabled: true
       tags: 
         - ensures
         

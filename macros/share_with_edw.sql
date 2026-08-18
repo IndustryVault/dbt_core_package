@@ -12,7 +12,7 @@
         {%- set secured_views %}
             select table_catalog as DATABASE, table_schema AS SCHEMA, table_name AS VIEW
             from {{ target.database }}.information_schema.views
-            where is_secure='YES' and table_schema = '{{ schema }}'
+            where is_secure='YES' and table_schema = '{{ schema | upper }}'
         {%- endset -%}
 
         {%- set views = run_query(secured_views) %}    

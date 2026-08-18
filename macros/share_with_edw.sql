@@ -11,8 +11,8 @@
 
         {%- set secured_views %}
             select table_catalog as DATABASE, table_schema AS SCHEMA, table_name AS VIEW
-            from aspengrove_uat.information_schema.views
-            where table_schema = 'PUBLIC' and is_secure='YES' and table_schema = '{{ schema }}'
+            from {{ target.database }}.information_schema.views
+            where is_secure='YES' and table_schema = '{{ schema | upper }}'
         {%- endset -%}
 
         {%- set views = run_query(secured_views) %}    

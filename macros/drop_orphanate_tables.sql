@@ -77,7 +77,7 @@
 
             {%- do log(drop_command, True) -%}
 
-            {%- if dry_run.upper() == 'FALSE' -%}
+            {%- if not dry_run -%}
                 {%- do run_query(drop_command) -%}
                 {%- do log('Executed', True) -%}
             {%- endif -%}
